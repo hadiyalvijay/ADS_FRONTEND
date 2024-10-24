@@ -17,7 +17,7 @@ const Statistics = () => {
     return (
         <Box
             sx={{
-                p: 2,
+                // p: 2,
                 bgcolor: isDarkMode ? '#2a2b40' : '#fff', // Background color based on theme
                 color: isDarkMode ? '#fff' : '#000', // Text color based on theme
                 borderRadius: 1,

@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 
-
+*{
+    top:0;
+    margin: 0;
+    padding: 0;
+  }
 
 nav ul {
     list-style-type: none;

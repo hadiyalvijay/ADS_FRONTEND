@@ -3,9 +3,6 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
-    Typography,
-    Grid,
-    Container,
     AppBar,
     Toolbar,
     IconButton,
@@ -15,7 +12,9 @@ import {
     MenuItem,
     Card,
     CardContent,
-    TextField, // Import TextField
+    TextField,
+    Grid,
+    Container,
 } from '@mui/material';
 import {
     Search,
@@ -33,7 +32,7 @@ import Sidebar from '../Sidebar/Sidebar';
 const Header = ({ onLogout }) => {
     const navigate = useNavigate();
     const [anchorElUser, setAnchorElUser] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(true); 
+    const [sidebarOpen, setSidebarOpen] = useState(true);
     const { isDarkMode, toggleTheme } = useTheme();
 
     const user = {
@@ -42,26 +41,28 @@ const Header = ({ onLogout }) => {
         avatarUrl: 'https://avatars.githubusercontent.com/u/19550456',
     };
 
+    const toggleSidebar = () => {
+        setSidebarOpen((prev) => !prev);
+    };
     const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
     const handleCloseUserMenu = () => setAnchorElUser(null);
 
     return (
-        <div>
+        // <div className='container-fluid'>
             <Box
                 sx={{
                     display: 'flex',
                     justifyContent: "center",
-                    alignItems: "center",
+                    alignItems: "flex-start", // Changed from center to flex-start
                     flexDirection: 'column',
-                    height: '98vh',
+                    height: '98vh', // Use 100vh for full height without overflow
                     backgroundColor: isDarkMode ? '#232333' : '#f5f5f9',
                     margin: 0,
                     padding: 0,
-                    
-                    
                 }}
             >
-                <Sidebar open={sidebarOpen} />
+                <Sidebar open={sidebarOpen} onClose={setSidebarOpen} />
+
                 <AppBar
                     position="fixed"
                     sx={{
@@ -69,15 +70,13 @@ const Header = ({ onLogout }) => {
                         color: isDarkMode ? '#fff' : '#000',
                         ml: 44,
                         right: 0,
-                        mr: 8,
-                        width: "76vw",
+                        mr: 6,
+                        width: "77.5vw",
                         borderRadius: 2,
-                        mt:2
-                        
-
+                        mt: 3, 
                     }}
                 >
-                    <Toolbar>
+                    <Toolbar sx={{ minHeight: 56 }}> 
                         <Tooltip title="Search">
                             <IconButton size="large" aria-label="search" sx={{ color: isDarkMode ? '#fff' : '#000' }}>
                                 <Search />
@@ -89,7 +88,7 @@ const Header = ({ onLogout }) => {
                             placeholder="Search..."
                             sx={{
                                 backgroundColor: isDarkMode ? '#2a2b40' : '#fff',
-                                borderRadius: 2, 
+                                borderRadius: 2,
                                 ml: 1,
                                 width: '100%',
                             }}
@@ -100,12 +99,8 @@ const Header = ({ onLogout }) => {
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Toggle Theme">
-                            <IconButton size="large" onClick={toggleTheme}>
-                                {isDarkMode ? (
-                                    <Brightness7 sx={{ color: '#FFD700' }} />
-                                ) : (
-                                    <Brightness4 sx={{ color: '#000080' }} />
-                                )}
+                            <IconButton size="large" onClick={toggleTheme} sx={{ color: isDarkMode ? '#FFD700' : '#000080' }}>
+                                {isDarkMode ? <Brightness7 /> : <Brightness4 />}
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Settings">
@@ -127,7 +122,7 @@ const Header = ({ onLogout }) => {
                     </Toolbar>
                 </AppBar>
 
-                <Toolbar /> {/* Placeholder for AppBar height */}
+                <Toolbar sx={{ minHeight: 56 }} /> {/* Placeholder for AppBar height */}
 
                 <Container
                     maxWidth="xl"
@@ -139,16 +134,16 @@ const Header = ({ onLogout }) => {
                         mr: 2,
                         mb: 0,
                         padding: 0,
-                        mt:4
+                        mt: 8, // Set margin top to 0 to eliminate space
                     }}
                 >
-                    <Grid container spacing={2} sx={{ p: 2 }}>
+                    <Grid container spacing={2} sx={{ p: 0 }}> {/* Remove padding from Grid */}
                         <Grid item xs={12} sm={4}>
                             <Card
                                 sx={{
                                     bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                                     height: '100%',
-                                    borderRadius: 2, // Add border radius for rounded corners
+                                    borderRadius: 2,
                                 }}
                             >
                                 <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -161,7 +156,7 @@ const Header = ({ onLogout }) => {
                                 sx={{
                                     bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                                     height: '100%',
-                                    borderRadius: 2, // Add border radius for rounded corners
+                                    borderRadius: 2,
                                 }}
                             >
                                 <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -184,17 +179,18 @@ const Header = ({ onLogout }) => {
                         </Grid>
                     </Grid>
 
-                    <Grid container spacing={3} sx={{ p: 2, mt: 2 }}>
-                        <Grid item xs={12} >
-                            <SearchFilters  />
+                    <Grid container spacing={3} sx={{ p: 0, mt: 2 }}> {/* Remove padding from Grid */}
+                        <Grid item xs={12}>
+                            <SearchFilters />
                         </Grid>
                     </Grid>
                 </Container>
             </Box>
-        </div>
+        // </div>
     );
 };
 
+// Define PropTypes
 Header.propTypes = {
     onLogout: PropTypes.func.isRequired,
 };

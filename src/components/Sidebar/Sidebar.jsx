@@ -1,174 +1,223 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
     Box,
-    Drawer,
     List,
     ListItem,
     ListItemIcon,
     ListItemText,
     Typography,
     IconButton,
-    Collapse,
 } from '@mui/material';
-import LayersIcon from '@mui/icons-material/Layers';
-import DescriptionIcon from '@mui/icons-material/Description';
-import MenuIcon from '@mui/icons-material/Menu';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import PersonIcon from '@mui/icons-material/Person';
-import AssessmentIcon from '@mui/icons-material/Assessment';
 import GridIcon from '@mui/icons-material/GridView';
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import ChevronRight from '@mui/icons-material/ChevronRight';
 import { useTheme } from '../ThemeContext';
 
 const Sidebar = ({ open, onClose }) => {
     const { isDarkMode } = useTheme();
-    const [isCollapsed, setIsCollapsed] = useState(false);
     const sidebarRef = useRef(null);
-    const toggleButtonRef = useRef(null);
-    const [isEmployeeOpen, setIsEmployeeOpen] = useState(false);
-    const [isReportsOpen, setIsReportsOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [showChildren, setShowChildren] = useState(false);
 
-    const toggleCollapse = () => {
-        setIsCollapsed((prev) => !prev);
+    const handleItemClick = (item) => {
+        console.log(`${item} clicked`);
     };
 
-    const toggleEmployeeList = () => {
-        setIsEmployeeOpen((prev) => !prev);
+    const toggleEmployeeChildren = () => {
+        setShowChildren((prev) => !prev);
     };
-
-    const toggleReportsList = () => {
-        setIsReportsOpen((prev) => !prev);
-    };
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                sidebarRef.current && !sidebarRef.current.contains(event.target) &&
-                toggleButtonRef.current && !toggleButtonRef.current.contains(event.target)
-            ) {
-                onClose(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [onClose]);
 
     return (
-        <Drawer
-            anchor="left"
-            variant="temporary"
-            open={open}
-            onClose={onClose}
-            disableScrollLock
-            ModalProps={{
-                onBackdropClick: onClose,
-                disableEnforceFocus: true,
-            }}
-            // BackdropProps={{
-            //     sx: {
-            //         backgroundColor: 'transparent',
-            //     },
-            // }}
+        <Box
+            ref={sidebarRef}
             sx={{
-                '& .MuiDrawer-paper': {
-                    boxSizing: 'border-box',
-                    bgcolor: isCollapsed ? 'transparent' : (isDarkMode ? '#232333' : '#fff'), // Change here
-                    color: isDarkMode ? '#fff' : '#000',
-                    width: isCollapsed ? 80 : 240,
-                    transition: 'width 0.3s ease',
-                    overflow: 'hidden',
+                width: isCollapsed ? '90px' : '240px',
+                height: '100vh',
+                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                color: isDarkMode ? '#fff' : '#000',
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                transition: 'width 0.3s ease',
+                zIndex: 1000,
+                '&:hover': {
+                    width: '240px',
+                    '& .MuiListItemText-root, & .adsh-title': {
+                        opacity: 1,
+                    },
+                    '& .toggle-button': {
+                        opacity: 1,
+                    },
                 },
             }}
-            ref={sidebarRef}
         >
             <Box
                 sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
-                    transition: 'opacity 0.3s ease',
-                    opacity: isCollapsed ? 0.5 : 1,
+                    m: 0.5,
                 }}
                 role="presentation"
             >
-                <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                <Box display={'flex'} justifyContent={'left'} alignItems={'center'}>
                     <img
                         src="https://adsdesk.adscodegensolutions.com/ads/photos/ads_logo_only.png"
                         alt="Logo"
                         style={{
-                            width: isCollapsed ? '40px' : '60px',
-                            height: 'auto',
-                            transition: 'width 0.3s ease',
+                            width: '100%',      // Set width to 100% to fill the container
+                            maxWidth: '100px',  // Limit the maximum width to 100 pixels
+                            height: 'auto',     // Maintain aspect ratio
+                            transition: 'transform 0.3s ease',
+                            cursor: 'pointer',
+                            opacity: 1,
+                            display: 'block',   // Ensures no extra space at the bottom
+                            margin: '0 auto',   // Center the image in its container
+                        }}
+                        onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.1)'; // Zoom in on hover
+                        }}
+                        onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)'; // Zoom out when not hovered
                         }}
                     />
-                    <Typography variant="h5" sx={{ mb: 2, visibility: isCollapsed ? 'hidden' : 'visible' }}>
-                        ADS
-                    </Typography>
-                    <Box
+
+                    <Typography
+                        variant="h5"
+                        className="adsh-title"
                         sx={{
-                            position: 'absolute',
-                            left: isCollapsed ? 'calc(80% - 28px)' : 'calc(240px - 28px)',
-                            transition: 'left 0.3s ease',
+                            margin: "15px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            mb: 2,
+                            color : isDarkMode ? '#cfc8e3':'#536880',
+                            opacity: isCollapsed ? 0 : 1, // Hide title when collapsed
+                            transition: 'opacity 0.3s ease',
                         }}
-                        ref={toggleButtonRef} 
                     >
-                        <IconButton onClick={toggleCollapse}>
-                            {isCollapsed ? <ArrowForwardIosIcon /> : <ArrowBackIosIcon />}
-                        </IconButton>
-                    </Box>
+                        ADSHR
+                    </Typography>
+
+                    {/* Toggle Collapse/Expand IconButton */}
+                    <IconButton
+                        className="toggle-button"
+                        onClick={() => setIsCollapsed((prev) => !prev)}
+                        sx={{
+                            border: '8px solid',
+                            height: "50px",
+                            width: "50px",
+                            borderColor: isDarkMode ? '#232333' : '#f6f5fa',
+                            borderRadius: '50%',
+                            bgcolor: isDarkMode ? '#8000ff' : '#8000ff',
+                            '&:hover': {
+                                bgcolor: isDarkMode ? '#8000ff' : '#8000ff',
+                            },
+                            opacity: isCollapsed ? 0 : 1, // Hide button when collapsed
+                        }}
+                    >
+                        {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+                    </IconButton>
                 </Box>
 
-                <List>
-                    <ListItem button onClick={toggleEmployeeList} sx={{ justifyContent: 'center' }}>
-                        <ListItemIcon sx={{ justifyContent: 'center' }}>
-                            <LayersIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={isCollapsed ? '' : 'Employee'} sx={{ textAlign: 'center' }} />
-                    </ListItem>
-                    <Collapse in={isEmployeeOpen} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-                            <ListItem button sx={{ pl: 4, justifyContent: 'center' }}>
-                                <ListItemIcon sx={{ justifyContent: 'center' }}>
-                                    <DescriptionIcon />
+                {/* Render menu items */}
+                <List sx={{cursor:"pointer"}}>
+                    {['Dashboard', 'Employee'].map((item, index) => (
+                        <React.Fragment key={index}>
+                            <ListItem
+                                button
+                            
+                                sx={{
+                                   
+                                    width: "100%",
+                                    '&:hover': {
+                                        bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
+                                    },
+                                }}
+                                onClick={() => {
+                                    if (item === 'Employee') {
+                                        toggleEmployeeChildren();
+                                    } else {
+                                        handleItemClick(item);
+                                    }
+                                }}
+                            >
+                                <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#c4bdd9' : '#67798f' ,}}>
+                                    {item === 'Dashboard' && <GridIcon />}
+                                    {item === 'Employee' && <PersonIcon />}
                                 </ListItemIcon>
-                                <ListItemText primary={isCollapsed ? '' : 'Attendance'} sx={{ textAlign: 'center' }} />
+                                <ListItemText
+                                    primary={item}
+                                    sx={{
+                                        textAlign: 'center',
+                                        width: 'auto',
+                                        opacity: isCollapsed ? 0 : 1,
+                                        transition: 'opacity 0.3s ease',
+                                        color: isDarkMode ? '#c4bdd9' : '#67798f' 
+                                    }}
+                                />
                             </ListItem>
-                        </List>
-                    </Collapse>
-
-                    <ListItem button onClick={toggleReportsList} sx={{ justifyContent: 'center' }}>
-                        <ListItemIcon sx={{ justifyContent: 'center' }}>
-                            <AssessmentIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={isCollapsed ? '' : 'Reports'} sx={{ textAlign: 'center' }} />
-                    </ListItem>
-                    <Collapse in={isReportsOpen} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-                            <ListItem button sx={{ pl: 4, justifyContent: 'center' }}>
-                                <ListItemIcon sx={{ justifyContent: 'center' }}>
-                                    <PersonIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={isCollapsed ? '' : 'User Reports'} sx={{ textAlign: 'center' }} />
-                            </ListItem>
-                        </List>
-                    </Collapse>
-
-                    {/* Additional menu items */}
-                    <ListItem button sx={{ justifyContent: 'center' }}>
-                        <ListItemIcon sx={{ justifyContent: 'center' }}>
-                            <GridIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={isCollapsed ? '' : 'Dashboard'} sx={{ textAlign: 'center' }} />
-                    </ListItem>
+                            {/* Child items for Employee */}
+                            {item === 'Employee' && showChildren && !isCollapsed && (
+                                <>
+                                    <ListItem
+                                        button
+                                        sx={{
+                                            fontSize:"10px",
+                                            pl: 4,
+                                            color: isDarkMode ? '#9b94b0' : '#67798f' ,
+                                            '&:hover': {
+                                                bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
+                                            },
+                                        }}
+                                        onClick={() => handleItemClick('Employee')}
+                                    >
+                                        <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#9b94b0' : '#67798f' }}>
+                                            <FiberManualRecordIcon fontSize='10%'/>
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary="Employee"
+                                            sx={{
+                                                textAlign: 'center',
+                                                
+                                                width: 'auto',
+                                                opacity: isCollapsed ? 0 : 1,
+                                                transition: 'opacity 0.3s ease',
+                                            }}
+                                        />
+                                    </ListItem>
+                                    <ListItem
+                                        button
+                                        sx={{
+                                            fontSize:"10px",
+                                            pl: 4,
+                                            color: isDarkMode ? '#9b94b0' : '#67798f' ,
+                                            '&:hover': {
+                                                bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
+                                            },
+                                        }}
+                                        onClick={() => handleItemClick('Attendance')}
+                                    >
+                                        <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#9b94b0' : '#67798f' }}>
+                                            <FiberManualRecordIcon fontSize='10%'/>
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary="Attendance"
+                                            sx={{
+                                                textAlign: 'center',
+                                                width: 'auto',
+                                                opacity: isCollapsed ? 0 : 1,
+                                                transition: 'opacity 0.3s ease',
+                                            }}
+                                        />
+                                    </ListItem>
+                                </>
+                            )}
+                        </React.Fragment>
+                    ))}
                 </List>
             </Box>
-        </Drawer>
+        </Box>
     );
 };
 

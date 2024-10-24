@@ -13,7 +13,7 @@ const SearchFilters = () => {
                 bgcolor: isDarkMode ? '#2a2b40' : '#fff', // Background color based on theme
                 color: isDarkMode ? '#fff' : '#000', // Text color based on theme
                 borderRadius: 2,
-                mt: 2,
+                // mt: 2,
             }}
         >
             <Grid container spacing={2}>
