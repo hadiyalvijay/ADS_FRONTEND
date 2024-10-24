@@ -24,7 +24,7 @@ const Home = () => {
 
   return (
     <Router>
-      <div>
+      <>
         {isSignedIn ? (
           <>
             <Header onLogout={handleSignOut} />
@@ -40,7 +40,7 @@ const Home = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         )}
-      </div>
+      </>
     </Router>
   );
 };

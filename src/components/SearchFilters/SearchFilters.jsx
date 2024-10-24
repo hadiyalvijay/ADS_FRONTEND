@@ -59,7 +59,7 @@ const SearchFilters = () => {
                                 bgcolor: '#fff',
                                 color: '#000',
                                 border: '1px solid #ccc',
-                                height: '50px', // Increased height for better visibility
+                                height: '50px', 
                                 textAlign: 'center',
                                 '& .MuiInputBase-input': {
                                     textAlign: 'center', // Center-align input text
@@ -91,7 +91,7 @@ const SearchFilters = () => {
                                 bgcolor: '#fff',
                                 color: '#000',
                                 border: '1px solid #ccc',
-                                height: '50px', // Increased height for better visibility
+                                height: '50px', 
                                 textAlign: 'center',
                                 '& .MuiInputBase-input': {
                                     textAlign: 'center', // Center-align input text

@@ -48,145 +48,142 @@ const Header = ({ onLogout }) => {
     const handleCloseUserMenu = () => setAnchorElUser(null);
 
     return (
-        // <div className='container-fluid'>
-            <Box
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100vh',
+                width: '100vw', 
+                backgroundColor: isDarkMode ? '#232333' : '#f5f5f9',
+                margin: -1,
+            }}
+        >
+            <Sidebar open={sidebarOpen} onClose={setSidebarOpen} />
+
+            <AppBar
+                // position="fixed"
                 sx={{
-                    display: 'flex',
-                    justifyContent: "center",
-                    alignItems: "flex-start", // Changed from center to flex-start
-                    flexDirection: 'column',
-                    height: '98vh', // Use 100vh for full height without overflow
-                    backgroundColor: isDarkMode ? '#232333' : '#f5f5f9',
-                    margin: 0,
-                    padding: 0,
+                    bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                    color: isDarkMode ? '#fff' : '#000',
+                    ml: 44,
+                    right: 0,
+                    mr: 7,
+                    width: "77.5vw",
+                    borderRadius: 2,
+                    mt: 3,
                 }}
             >
-                <Sidebar open={sidebarOpen} onClose={setSidebarOpen} />
+                <Toolbar sx={{ minHeight: 56 }}>
+                    <Tooltip title="Search">
+                        <IconButton size="large" aria-label="search" sx={{ color: isDarkMode ? '#fff' : '#000' }}>
+                            <Search />
+                        </IconButton>
+                    </Tooltip>
+                    <TextField
+                        variant="outlined"
+                        size="small"
+                        placeholder="Search..."
+                        sx={{
+                            backgroundColor: isDarkMode ? '#fff' : '#fff',
+                            borderRadius: 2,
+                            width: '90%',
+                        }}
+                    />
+                    <Tooltip title="Notifications">
+                        <IconButton size="large" aria-label="notifications" sx={{ color: isDarkMode ? '#fff' : '#000', ml: 1 }}>
+                            <Notifications />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Toggle Theme">
+                        <IconButton size="large" onClick={toggleTheme} sx={{ color: isDarkMode ? '#FFD700' : '#000080' }}>
+                            {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Settings">
+                        <IconButton size="large" onClick={handleOpenUserMenu}>
+                            <Avatar alt={user.name} src={user.avatarUrl} />
+                        </IconButton>
+                    </Tooltip>
+                    <Menu
+                        sx={{ mt: '45px' }}
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        keepMounted
+                        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                    >
+                        <MenuItem onClick={onLogout}>Logout</MenuItem>
+                    </Menu>
+                </Toolbar>
+            </AppBar>
 
-                <AppBar
-                    position="fixed"
-                    sx={{
-                        bgcolor: isDarkMode ? '#2a2b40' : '#fff',
-                        color: isDarkMode ? '#fff' : '#000',
-                        ml: 44,
-                        right: 0,
-                        mr: 6,
-                        width: "77.5vw",
-                        borderRadius: 2,
-                        mt: 3, 
-                    }}
-                >
-                    <Toolbar sx={{ minHeight: 56 }}> 
-                        <Tooltip title="Search">
-                            <IconButton size="large" aria-label="search" sx={{ color: isDarkMode ? '#fff' : '#000' }}>
-                                <Search />
-                            </IconButton>
-                        </Tooltip>
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            placeholder="Search..."
+            <Toolbar sx={{ minHeight: 56 }} /> {/* Placeholder for AppBar height */}
+
+            <Container
+                maxWidth="xl"
+                sx={{
+                    flexGrow: 1,
+                    bgcolor: isDarkMode ? '#232333' : '#f5f5f9',
+                    color: isDarkMode ? '#fff' : '#000',
+                    ml: 44,
+                    mr: 2,
+                    mb: 0,
+                    padding: 0,
+                    mt: 8,
+                    display: 'flex', // Ensure the container uses flexbox
+                    flexDirection: 'column', // Column layout for children
+                }}
+            >
+                <Grid container spacing={2} sx={{ p: 0 }}>
+                    <Grid item xs={12} sm={4}>
+                        <Card
                             sx={{
-                                backgroundColor: isDarkMode ? '#2a2b40' : '#fff',
+                                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                                height: '100%',
                                 borderRadius: 2,
-                                ml: 1,
-                                width: '100%',
                             }}
-                        />
-                        <Tooltip title="Notifications">
-                            <IconButton size="large" aria-label="notifications" sx={{ color: isDarkMode ? '#fff' : '#000', ml: 1 }}>
-                                <Notifications />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Toggle Theme">
-                            <IconButton size="large" onClick={toggleTheme} sx={{ color: isDarkMode ? '#FFD700' : '#000080' }}>
-                                {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Settings">
-                            <IconButton size="large" onClick={handleOpenUserMenu}>
-                                <Avatar alt={user.name} src={user.avatarUrl} />
-                            </IconButton>
-                        </Tooltip>
-                        <Menu
-                            sx={{ mt: '45px' }}
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                            keepMounted
-                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
                         >
-                            <MenuItem onClick={onLogout}>Logout</MenuItem>
-                        </Menu>
-                    </Toolbar>
-                </AppBar>
-
-                <Toolbar sx={{ minHeight: 56 }} /> {/* Placeholder for AppBar height */}
-
-                <Container
-                    maxWidth="xl"
-                    sx={{
-                        flexGrow: 1,
-                        bgcolor: isDarkMode ? '#232333' : '#f5f5f9',
-                        color: isDarkMode ? '#fff' : '#000',
-                        ml: 44,
-                        mr: 2,
-                        mb: 0,
-                        padding: 0,
-                        mt: 8, // Set margin top to 0 to eliminate space
-                    }}
-                >
-                    <Grid container spacing={2} sx={{ p: 0 }}> {/* Remove padding from Grid */}
-                        <Grid item xs={12} sm={4}>
-                            <Card
-                                sx={{
-                                    bgcolor: isDarkMode ? '#2a2b40' : '#fff',
-                                    height: '100%',
-                                    borderRadius: 2,
-                                }}
-                            >
-                                <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                                    <Timesheet />
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <Card
-                                sx={{
-                                    bgcolor: isDarkMode ? '#2a2b40' : '#fff',
-                                    height: '100%',
-                                    borderRadius: 2,
-                                }}
-                            >
-                                <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                                    <Statistics />
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <Card
-                                sx={{
-                                    bgcolor: isDarkMode ? '#2a2b40' : '#fff',
-                                    height: '100%',
-                                    borderRadius: 2,
-                                }}
-                            >
-                                <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                                    <ActivityTimeline />
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <Timesheet />
+                            </CardContent>
+                        </Card>
                     </Grid>
-
-                    <Grid container spacing={3} sx={{ p: 0, mt: 2 }}> {/* Remove padding from Grid */}
-                        <Grid item xs={12}>
-                            <SearchFilters />
-                        </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <Card
+                            sx={{
+                                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                                height: '100%',
+                                borderRadius: 2,
+                            }}
+                        >
+                            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <Statistics />
+                            </CardContent>
+                        </Card>
                     </Grid>
-                </Container>
-            </Box>
-        // </div>
+                    <Grid item xs={12} sm={4}>
+                        <Card
+                            sx={{
+                                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                                height: '100%',
+                                borderRadius: 2,
+                            }}
+                        >
+                            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <ActivityTimeline />
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                </Grid>
+
+                <Grid container spacing={3} sx={{ p: 0, mt: 2 }}>
+                    <Grid item xs={12}>
+                        <SearchFilters />
+                    </Grid>
+                </Grid>
+            </Container>
+        </Box>
     );
 };
 
