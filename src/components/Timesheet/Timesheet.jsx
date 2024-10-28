@@ -1,19 +1,15 @@
+// Timesheet.js
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useTheme } from '../ThemeContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Clock from './Clock';
+import ActionButtons from './ActionButtons';
 
-const Timesheet = () => {
+const Timesheet = ({labels,getTimeValue,handleToggle}) => {
     const { isDarkMode } = useTheme();
-
-    const [time, setTime] = useState({
-        hours: '00',
-        minutes: '00',
-        seconds: '00',
-        period: 'AM',
-    });
-
+    const [time, setTime] = useState({ hours: '00', minutes: '00', seconds: '00', period: 'AM' });
     const [digitalTime, setDigitalTime] = useState('');
     const [isTimerRunning, setIsTimerRunning] = useState(false);
     const [startTime, setStartTime] = useState(null);
@@ -22,15 +18,18 @@ const Timesheet = () => {
     const [isOnBreak, setIsOnBreak] = useState(false);
     const [workTime, setWorkTime] = useState(0);
     const [lunchTime, setLunchTime] = useState(0);
-    const [breakTime, setBreakTime] = useState(0)
-
-
+    const [breakTime, setBreakTime] = useState(0);
+    const [totalWorkTime, setTotalWorkTime] = useState(0);
+    const [isPunchedOut, setIsPunchedOut] = useState(false);
+    const [activeState, setActiveState] = useState("in");
 
     useEffect(() => {
+        // Loading saved times from localStorage
         const savedStartTime = localStorage.getItem('startTime');
         const savedWorkTime = parseInt(localStorage.getItem('workTime')) || 0;
         const savedLunchTime = parseInt(localStorage.getItem('lunchTime')) || 0;
         const savedBreakTime = parseInt(localStorage.getItem('breakTime')) || 0;
+        const savedTotalWorkTime = parseInt(localStorage.getItem('totalWorkTime')) || 0;
 
         if (savedStartTime) {
             setStartTime(parseInt(savedStartTime));
@@ -39,10 +38,17 @@ const Timesheet = () => {
         setWorkTime(savedWorkTime);
         setLunchTime(savedLunchTime);
         setBreakTime(savedBreakTime);
+        setTotalWorkTime(savedTotalWorkTime);
     }, []);
 
+    // Time update logic
     useEffect(() => {
         let intervalId;
+
+        const updateClock = () => {
+            const now = new Date();
+            setDigitalTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }));
+        };
 
         if (isTimerRunning) {
             intervalId = setInterval(() => {
@@ -60,86 +66,81 @@ const Timesheet = () => {
             }, 1000);
         }
 
-        // updateClock();
+        updateClock();
+
         return () => clearInterval(intervalId);
     }, [isTimerRunning, startTime]);
 
-
     const punchIn = () => {
         setIsTimerRunning(true);
-        setStartTime(Date.now());
+        const now = Date.now();
+        setStartTime(now);
         setCurrentActivity('Punch In');
         toast.success("Punch In Successfully!");
-        localStorage.setItem('startTime', Date.now());
+        localStorage.setItem('startTime', now);
+        setActiveState("in");
     };
 
     const lunchIn = () => {
         if (isTimerRunning) {
             setIsOnLunch(true);
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            setWorkTime(prev => prev + elapsedTime);
             setStartTime(Date.now());
             toast.info('Lunch In Successfully!');
         }
     };
 
     const lunchOut = () => {
-        setIsOnLunch(false);
-        setStartTime(null);
-        toast.info('Lunch Out Successfully!');
+        if (isOnLunch) {
+            const elapsedLunchTime = Math.floor((Date.now() - startTime) / 1000);
+            setLunchTime(prev => prev + elapsedLunchTime);
+            setIsOnLunch(false);
+            setStartTime(Date.now());
+            toast.success('Lunch break ended!');
+        }
     };
 
     const breakIn = () => {
         if (isTimerRunning) {
             setIsOnBreak(true);
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            setWorkTime(prev => prev + elapsedTime);
             setStartTime(Date.now());
-            toast.info("Break In Successfully!");
+            toast.info('On break!');
         }
     };
 
     const breakOut = () => {
-        setIsOnBreak(false);
-        setStartTime(null);
-        toast.info("Break Out Successfully!");
+        if (isOnBreak) {
+            const elapsedBreakTime = Math.floor((Date.now() - startTime) / 1000);
+            setBreakTime(prev => prev + elapsedBreakTime);
+            setIsOnBreak(false);
+            setStartTime(Date.now());
+            toast.success('Break ended!');
+        }
     };
 
     const punchOut = () => {
         setIsTimerRunning(false);
-        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-        const totalWorkTime = workTime + elapsedTime; // Update total work time
-        setWorkTime(totalWorkTime);
-        localStorage.setItem('workTime', totalWorkTime); // Save to local storage
-        setTime({
-            hours: '00',
-            minutes: '00',
-            seconds: '00',
-            period: 'AM',
-        });
-        setStartTime(null);
-        setCurrentActivity('');
+        const totalSecondsWorked = workTime + lunchTime + breakTime; 
+        const actualWorkTime = workTime; // Total work time is now just work time
+        setTotalWorkTime(actualWorkTime); // Store the actual work time
+        setIsPunchedOut(true); // Mark that the user has punched out
+        localStorage.setItem('workTime', actualWorkTime); // Save work time
+        localStorage.setItem('lunchTime', lunchTime); // Save lunch time
+        localStorage.setItem('breakTime', breakTime); // Save break time
+        localStorage.setItem('totalWorkTime', totalSecondsWorked); // Save total work time
         localStorage.removeItem('startTime');
-        toast.success("Punch Out Successfully!");
+        setActiveState("out");
     };
 
-    
     const formatTotalWorkTime = (totalSeconds) => {
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
-        return `${hours} hours ${minutes} minutes ${seconds} seconds`;
+        return `${hours}h ${minutes}m ${seconds}s`;
     };
-
-    const setProgress = (progress) => {
-        return (progress / 60) * (2 * Math.PI * 36);
-    };
-
-    const hourCircleStroke = isDarkMode ? "#ff4500" : "#007bff";
-    const overtimeCircleStroke = isDarkMode ? "#FFD700" : "#FFC107";
-
-    const hoursWorked = parseFloat(time.hours) + (parseFloat(time.minutes) / 60);
-    const isOvertime = hoursWorked > 8;
-
-
-    const hoursInCircle = Math.min(hoursWorked, 8);
-    const overtimeInCircle = isOvertime ? hoursWorked - 8 : 0;
 
     return (
         <Box
@@ -153,207 +154,32 @@ const Timesheet = () => {
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Timesheet
             </Typography>
-            <Typography>Current session: {formatTotalWorkTime(workTime)} / 8 hrs</Typography>
+            {isPunchedOut ? (
+                <Typography variant="body1" sx={{ my: 2, color: 'green' }}>
+                    Total Work Time: {formatTotalWorkTime(totalWorkTime)} / 8 hrs
+                </Typography>
+            ) : (
+                <Typography>Current session: {formatTotalWorkTime(workTime)} / 8 hrs</Typography>
+            )}
             <Typography variant="h4" sx={{ my: 2, textAlign: 'center' }}>
-                {`${time.hours}:${time.minutes}:${time.seconds} ${time.period}`} {/* Display formatted time */}
+                {`${time.hours}:${time.minutes}:${time.seconds} ${time.period}`} 
             </Typography>
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', mt: 3 }}>
-                {/* Hours */}
-                <Box className="clock-item" sx={{ textAlign: 'center' }}>
-                    <svg width="80" height="80">
-                        <circle
-                            className="progress-ring__circle"
-                            stroke={hourCircleStroke}
-                            strokeWidth="4"
-                            fill="transparent"
-                            r="36"
-                            cx="40"
-                            cy="40"
-                            style={{
-                                strokeDasharray: 2 * Math.PI * 36,
-                                strokeDashoffset: 2 * Math.PI * 36 - setProgress(hoursInCircle * 60),
-                                transform: 'rotate(-90deg)',
-                                transformOrigin: '50% 50%',
-                                transition: '0.35s stroke-dashoffset',
-                            }}
-                        />
-                        {/* Circle for overtime */}
-                        {isOvertime && (
-                            <circle
-                                className="progress-ring__circle-overtime"
-                                stroke={overtimeCircleStroke}
-                                strokeWidth="4"
-                                fill="transparent"
-                                r="36"
-                                cx="40"
-                                cy="40"
-                                style={{
-                                    strokeDasharray: 2 * Math.PI * 36,
-                                    strokeDashoffset: 2 * Math.PI * 36 - setProgress(overtimeInCircle * 60), // Overtime calculation
-                                    transform: 'rotate(-90deg)',
-                                    transformOrigin: '50% 50%',
-                                    transition: '0.35s stroke-dashoffset',
-                                }}
-                            />
-                        )}
-                        <circle
-                            className="progress-dot"
-                            fill={isOvertime ? overtimeCircleStroke : hourCircleStroke}
-                            r="3"
-                            cx="40"
-                            cy="4"
-                            style={{
-                                transform: `rotate(${setProgress(hoursInCircle * 60)}deg)`, // Limit to 8 hours
-                                transformOrigin: '40px 40px',
-                                transition: '0.35s transform',
-                            }}
-                        />
-                        <text
-                            x="50%"
-                            y="50%"
-                            dominantBaseline="middle"
-                            textAnchor="middle"
-                            fill={isOvertime ? overtimeCircleStroke : hourCircleStroke}
-                            fontSize="14px"
-                        >
-                            {time.hours}
-                        </text>
-                    </svg>
-                    <Typography className="time-unit">Hours</Typography>
-                </Box>
-                {/* Minutes */}
-                <Box className="clock-item" sx={{ textAlign: 'center' }}>
-                    <svg width="80" height="80">
-                        <circle
-                            className="progress-ring__circle"
-                            stroke={isDarkMode ? "#FFFF" : "#17a2b8"} // Maintain original colors for minutes
-                            strokeWidth="4"
-                            fill="transparent"
-                            r="36"
-                            cx="40"
-                            cy="40"
-                            style={{
-                                strokeDasharray: 2 * Math.PI * 36,
-                                strokeDashoffset: 2 * Math.PI * 36 - setProgress(time.minutes),
-                                transform: 'rotate(-90deg)',
-                                transformOrigin: '50% 50%',
-                                transition: '0.35s stroke-dashoffset',
-                            }}
-                        />
-                        <circle
-                            className="progress-dot"
-                            fill={isDarkMode ? "#FFFF" : "#17a2b8"}
-                            r="3"
-                            cx="40"
-                            cy="4"
-                            style={{
-                                transform: `rotate(${setProgress(time.minutes)}deg)`,
-                                transformOrigin: '40px 40px',
-                                transition: '0.35s transform',
-                            }}
-                        />
-                        <text
-                            x="50%"
-                            y="50%"
-                            dominantBaseline="middle"
-                            textAnchor="middle"
-                            fill={isDarkMode ? "#FFFF" : "#17a2b8"}
-                            fontSize="14px"
-                        >
-                            {time.minutes}
-                        </text>
-                    </svg>
-                    <Typography className="time-unit">Minutes</Typography>
-                </Box>
-                {/* Seconds */}
-                <Box className="clock-item" sx={{ textAlign: 'center' }}>
-                    <svg width="80" height="80">
-                        <circle
-                            className="progress-ring__circle"
-                            stroke={isDarkMode ? "#FFFF" : "#28a745"} // Maintain original colors for seconds
-                            strokeWidth="4"
-                            fill="transparent"
-                            r="36"
-                            cx="40"
-                            cy="40"
-                            style={{
-                                strokeDasharray: 2 * Math.PI * 36,
-                                strokeDashoffset: 2 * Math.PI * 36 - setProgress(time.seconds),
-                                transform: 'rotate(-90deg)',
-                                transformOrigin: '50% 50%',
-                                transition: '0.35s stroke-dashoffset',
-                            }}
-                        />
-                        <circle
-                            className="progress-dot"
-                            fill={isDarkMode ? "#FFFF" : "#28a745"}
-                            r="3"
-                            cx="40"
-                            cy="4"
-                            style={{
-                                transform: `rotate(${setProgress(time.seconds)}deg)`,
-                                transformOrigin: '40px 40px',
-                                transition: '0.35s transform',
-                            }}
-                        />
-                        <text
-                            x="50%"
-                            y="50%"
-                            dominantBaseline="middle"
-                            textAnchor="middle"
-                            fill={isDarkMode ? "#FFFF" : "#28a745"}
-                            fontSize="14px"
-                        >
-                            {time.seconds}
-                        </text>
-                    </svg>
-                    <Typography className="time-unit">Seconds</Typography>
-                </Box>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 4 }}>
-                {!isTimerRunning ? (
-                    <Box>
-                        <Button variant="contained" color="primary" onClick={punchIn}>
-                            Punch In
-                        </Button>
-                    </Box>
-                ) : (
-                    <Box>
-                        {isOnBreak ? (
-                            <Button variant="contained" color="success" onClick={breakOut}>
-                                Break Out
-                            </Button>
-                        ) : (
-                            <Box>
-                                {isOnLunch ? (
-                                    <Button variant="contained" color="secondary" onClick={lunchOut}>
-                                        Lunch Out
-                                    </Button>
-                                ) : (
-                                    <Box sx={{ textAlign: "center", gap: 2 }}>
-                                        <Box >
-                                            <Button variant="contained" color="primary" onClick={punchOut}>
-                                                Punch Out
-                                            </Button>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                                            <Button variant="contained" color="secondary" onClick={lunchIn}>
-                                                Lunch In
-                                            </Button>
-                                            <Button variant="contained" color="success" onClick={breakIn}>
-                                                Break In
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                )}
-                            </Box>
-                        )}
-                    </Box>
-                )}
-            </Box>
+            <Clock time={time} isDarkMode={isDarkMode} />
+            <ActionButtons
+                isTimerRunning={isTimerRunning}
+                isOnBreak={isOnBreak}
+                isOnLunch={isOnLunch}
+                punchIn={punchIn}
+                lunchIn={lunchIn}
+                lunchOut={lunchOut}
+                breakIn={breakIn}
+                breakOut={breakOut}
+                punchOut={punchOut}
+                activeState={activeState}
+                setActiveState={setActiveState}
+                workTime={workTime} // Pass work time to the component if needed
+            />
             <ToastContainer />
-
         </Box>
     );
 };
