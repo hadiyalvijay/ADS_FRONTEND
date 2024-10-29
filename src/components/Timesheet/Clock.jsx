@@ -9,7 +9,7 @@ const Clock = ({ time, isDarkMode }) => {
         ? { hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds' } 
         : { hours: 'Work', minutes: 'Lunch', seconds: 'Break' };
 
-    // Define time values based on the active state (for example purposes, the same time object is used)
+
     const getTimeValue = (type) => {
         switch (type) {
             case 'hours':

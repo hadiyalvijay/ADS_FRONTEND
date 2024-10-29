@@ -1,6 +1,10 @@
-import React from 'react';
-import Home from './components/Home';
+// src/App.js
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+// import SignIn from './SignIn/signin'; 
+import Header from './components/MainContent/Header'; 
 import { ThemeProvider } from 'styled-components';
+import SignIn from './components/SignIn/signin';
 
 // Define your theme object
 const demoTheme = {
@@ -13,18 +17,51 @@ const demoTheme = {
         info: '#17a2b8',
         light: '#f8f9fa',
         dark: '#343a40',
-        background: '#ffffff', // Background color for light mode
-        text: '#212529', // Text color
+        background: '#ffffff',
+        text: '#212529', 
     },
-    spacing: (factor) => `${0.25 * factor}rem`, // Spacing function
+    spacing: (factor) => `${0.25 * factor}rem`, 
 };
 
 // Main App component
 const App = () => {
-    
+    const [isSignedIn, setIsSignedIn] = useState(false);
+
+    useEffect(() => {
+        const loggedInStatus = localStorage.getItem('isLoggedIn') === 'true';
+        setIsSignedIn(loggedInStatus);
+    }, []);
+
+    const handleSignIn = () => {
+        setIsSignedIn(true);
+        localStorage.setItem('isLoggedIn', 'true');
+    };
+
+    const handleSignOut = () => {
+        setIsSignedIn(false);
+        localStorage.removeItem('isLoggedIn');
+    };
+
     return (
         <ThemeProvider theme={demoTheme}>
-            <Home />
+            <Router>
+                <>
+                    {isSignedIn ? (
+                        <>
+                            <Header onLogout={handleSignOut} />
+                            <Routes>
+                                <Route path="/" element={<div>Welcome to the dashboard!</div>} /> {/* Add your main component here */}
+                                <Route path="*" element={<Navigate to="/" />} />
+                            </Routes>
+                        </>
+                    ) : (
+                        <Routes>
+                            <Route path="/" element={<SignIn onSignIn={handleSignIn} />} />
+                            <Route path="*" element={<Navigate to="/" />} />
+                        </Routes>
+                    )}
+                </>
+            </Router>
         </ThemeProvider>
     );
 };

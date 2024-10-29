@@ -149,6 +149,7 @@ const Timesheet = ({labels,getTimeValue,handleToggle}) => {
                 color: isDarkMode ? '#fff' : '#000',
                 borderRadius: 1,
                 p: 3,
+                height:'365px'
             }}
         >
             <Typography variant="h6" sx={{ mb: 2 }}>

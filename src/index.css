@@ -3,4 +3,9 @@
 @tailwind utilities;
 
 
+#header {
+    overflow-x: auto; /* Allow horizontal scrolling */
+    white-space: nowrap; /* Prevent wrapping of children */
+    scroll-behavior: smooth; /* Enable smooth scrolling */
+}
 

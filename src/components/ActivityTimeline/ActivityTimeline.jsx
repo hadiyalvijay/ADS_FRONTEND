@@ -1,4 +1,3 @@
-// src/components/ActivityTimeline.js
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTheme } from '../ThemeContext';
@@ -13,6 +12,7 @@ const ActivityTimeline = () => {
                 bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                 color: isDarkMode ? '#fff' : '#000',
                 borderRadius: 1,
+                height: '380px', // Set the desired height here
             }}
         >
             <Typography variant="h6">Activity Timeline</Typography>

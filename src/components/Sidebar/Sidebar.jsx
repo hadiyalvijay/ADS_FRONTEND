@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
     Box,
@@ -8,19 +8,21 @@ import {
     ListItemText,
     Typography,
     IconButton,
+    useMediaQuery,
 } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import PersonIcon from '@mui/icons-material/Person';
 import GridIcon from '@mui/icons-material/GridView';
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
 import ChevronRight from '@mui/icons-material/ChevronRight';
-import { useTheme } from '../ThemeContext';
+import { useTheme } from '../ThemeContext'; // Adjust path as necessary
 
-const Sidebar = ({ open, onClose }) => {
+const Sidebar = ({ open, onClose, toggleScroll }) => {
     const { isDarkMode } = useTheme();
     const sidebarRef = useRef(null);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [showChildren, setShowChildren] = useState(false);
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     const handleItemClick = (item) => {
         console.log(`${item} clicked`);
@@ -29,6 +31,13 @@ const Sidebar = ({ open, onClose }) => {
     const toggleEmployeeChildren = () => {
         setShowChildren((prev) => !prev);
     };
+
+    // Collapse sidebar automatically on mobile devices
+    useEffect(() => {
+        if (isMobile) {
+            setIsCollapsed(true);
+        }
+    }, [isMobile]);
 
     return (
         <Box
@@ -44,41 +53,35 @@ const Sidebar = ({ open, onClose }) => {
                 transition: 'width 0.3s ease',
                 zIndex: 1000,
                 '&:hover': {
-                    width: '240px',
+                    width: isMobile ? '90px' : '240px',
                     '& .MuiListItemText-root, & .adsh-title': {
-                        opacity: 1,
+                        opacity: isMobile ? 0 : 1,
                     },
                     '& .toggle-button': {
-                        opacity: 1,
+                        opacity: isMobile ? 0 : 1,
                     },
                 },
             }}
         >
-            <Box
-                sx={{
-                    m: 0.5,
-                }}
-                role="presentation"
-            >
+            <Box role="presentation">
                 <Box display={'flex'} justifyContent={'left'} alignItems={'center'}>
                     <img
                         src="https://adsdesk.adscodegensolutions.com/ads/photos/ads_logo_only.png"
                         alt="Logo"
                         style={{
-                            width: '100%',      // Set width to 100% to fill the container
-                            maxWidth: '100px',  // Limit the maximum width to 100 pixels
-                            height: 'auto',     // Maintain aspect ratio
+                            width: '100%',
+                            maxWidth: '100px',
+                            height: 'auto',
                             transition: 'transform 0.3s ease',
                             cursor: 'pointer',
-                            opacity: 1,
-                            display: 'block',   // Ensures no extra space at the bottom
-                            margin: '0 auto',   // Center the image in its container
+                            display: 'block',
+                            margin: '0 auto',
                         }}
                         onMouseOver={(e) => {
-                            e.currentTarget.style.transform = 'scale(1.1)'; // Zoom in on hover
+                            e.currentTarget.style.transform = 'scale(1.1)';
                         }}
                         onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'scale(1)'; // Zoom out when not hovered
+                            e.currentTarget.style.transform = 'scale(1)';
                         }}
                     />
 
@@ -86,50 +89,47 @@ const Sidebar = ({ open, onClose }) => {
                         variant="h5"
                         className="adsh-title"
                         sx={{
-                            margin: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
+                            margin: '15px',
                             mb: 2,
-                            color : isDarkMode ? '#cfc8e3':'#536880',
-                            opacity: isCollapsed ? 0 : 1, // Hide title when collapsed
+                            color: isDarkMode ? '#cfc8e3' : '#536880',
+                            opacity: isCollapsed ? 0 : 1,
                             transition: 'opacity 0.3s ease',
+                            display: isMobile ? 'none' : 'block', // Hide title on mobile
                         }}
                     >
                         ADSHR
                     </Typography>
 
-                    {/* Toggle Collapse/Expand IconButton */}
                     <IconButton
                         className="toggle-button"
-                        onClick={() => setIsCollapsed((prev) => !prev)}
+                        onClick={() => {
+                            setIsCollapsed((prev) => !prev);
+                            toggleScroll('left'); // Trigger scroll effect to left
+                            onClose(); // Close sidebar when toggling
+                        }}
                         sx={{
                             border: '8px solid',
-                            height: "50px",
-                            width: "50px",
+                            height: '50px',
+                            width: '50px',
                             borderColor: isDarkMode ? '#232333' : '#f6f5fa',
                             borderRadius: '50%',
                             bgcolor: isDarkMode ? '#8000ff' : '#8000ff',
                             '&:hover': {
                                 bgcolor: isDarkMode ? '#8000ff' : '#8000ff',
                             },
-                            opacity: isCollapsed ? 0 : 1, // Hide button when collapsed
+                            opacity: isCollapsed ? 0 : 1,
                         }}
                     >
                         {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
                     </IconButton>
                 </Box>
 
-                {/* Render menu items */}
-                <List sx={{cursor:"pointer"}}>
+                <List sx={{ cursor: 'pointer' }}>
                     {['Dashboard', 'Employee'].map((item, index) => (
                         <React.Fragment key={index}>
                             <ListItem
                                 button
-                            
                                 sx={{
-                                   
-                                    width: "100%",
                                     '&:hover': {
                                         bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
                                     },
@@ -142,75 +142,46 @@ const Sidebar = ({ open, onClose }) => {
                                     }
                                 }}
                             >
-                                <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#c4bdd9' : '#67798f' ,}}>
+                                <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
                                     {item === 'Dashboard' && <GridIcon />}
                                     {item === 'Employee' && <PersonIcon />}
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={item}
                                     sx={{
-                                        textAlign: 'center',
-                                        width: 'auto',
                                         opacity: isCollapsed ? 0 : 1,
                                         transition: 'opacity 0.3s ease',
-                                        color: isDarkMode ? '#c4bdd9' : '#67798f' 
+                                        color: isDarkMode ? '#c4bdd9' : '#67798f',
                                     }}
                                 />
                             </ListItem>
-                            {/* Child items for Employee */}
                             {item === 'Employee' && showChildren && !isCollapsed && (
                                 <>
-                                    <ListItem
-                                        button
-                                        sx={{
-                                            fontSize:"10px",
-                                            pl: 4,
-                                            color: isDarkMode ? '#9b94b0' : '#67798f' ,
-                                            '&:hover': {
-                                                bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
-                                            },
-                                        }}
-                                        onClick={() => handleItemClick('Employee')}
-                                    >
-                                        <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#9b94b0' : '#67798f' }}>
-                                            <FiberManualRecordIcon fontSize='10%'/>
-                                        </ListItemIcon>
-                                        <ListItemText
-                                            primary="Employee"
+                                    {['Employee', 'Attendance'].map((childItem, idx) => (
+                                        <ListItem
+                                            key={idx}
+                                            button
                                             sx={{
-                                                textAlign: 'center',
-                                                
-                                                width: 'auto',
-                                                opacity: isCollapsed ? 0 : 1,
-                                                transition: 'opacity 0.3s ease',
+                                                pl: 4,
+                                                color: isDarkMode ? '#9b94b0' : '#67798f',
+                                                '&:hover': {
+                                                    bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
+                                                },
                                             }}
-                                        />
-                                    </ListItem>
-                                    <ListItem
-                                        button
-                                        sx={{
-                                            fontSize:"10px",
-                                            pl: 4,
-                                            color: isDarkMode ? '#9b94b0' : '#67798f' ,
-                                            '&:hover': {
-                                                bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
-                                            },
-                                        }}
-                                        onClick={() => handleItemClick('Attendance')}
-                                    >
-                                        <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#9b94b0' : '#67798f' }}>
-                                            <FiberManualRecordIcon fontSize='10%'/>
-                                        </ListItemIcon>
-                                        <ListItemText
-                                            primary="Attendance"
-                                            sx={{
-                                                textAlign: 'center',
-                                                width: 'auto',
-                                                opacity: isCollapsed ? 0 : 1,
-                                                transition: 'opacity 0.3s ease',
-                                            }}
-                                        />
-                                    </ListItem>
+                                            onClick={() => handleItemClick(childItem)}
+                                        >
+                                            <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#9b94b0' : '#67798f' }}>
+                                                <FiberManualRecordIcon fontSize="small" />
+                                            </ListItemIcon>
+                                            <ListItemText
+                                                primary={childItem}
+                                                sx={{
+                                                    opacity: isCollapsed ? 0 : 1,
+                                                    transition: 'opacity 0.3s ease',
+                                                }}
+                                            />
+                                        </ListItem>
+                                    ))}
                                 </>
                             )}
                         </React.Fragment>
@@ -221,10 +192,10 @@ const Sidebar = ({ open, onClose }) => {
     );
 };
 
-// Define PropTypes
 Sidebar.propTypes = {
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
+    toggleScroll: PropTypes.func.isRequired, // Add toggleScroll as a prop
 };
 
 export default Sidebar;
