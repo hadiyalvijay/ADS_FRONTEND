@@ -20,9 +20,17 @@ import { useTheme } from '../ThemeContext'; // Adjust path as necessary
 const Sidebar = ({ open, onClose, toggleScroll }) => {
     const { isDarkMode } = useTheme();
     const sidebarRef = useRef(null);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    
+    // Retrieve the initial state from localStorage
+    const storedCollapsedState = localStorage.getItem('sidebarCollapsed') === 'true';
+    const [isCollapsed, setIsCollapsed] = useState(storedCollapsedState || false);
     const [showChildren, setShowChildren] = useState(false);
     const isMobile = useMediaQuery('(max-width: 768px)');
+
+    
+    useEffect(() => {
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }, [isCollapsed]);
 
     const handleItemClick = (item) => {
         console.log(`${item} clicked`);
@@ -43,15 +51,15 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
         <Box
             ref={sidebarRef}
             sx={{
-                width: isCollapsed ? '90px' : '240px',
+                width: isCollapsed ? '80px' : '240px',
                 height: '100vh',
-                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
-                color: isDarkMode ? '#fff' : '#000',
+                bgcolor: isDarkMode ? '#2a2b40' : '#ffffff',
+                color: isDarkMode ? '#fff' : '#566a7f',
                 position: 'fixed',
                 left: 0,
                 top: 0,
                 transition: 'width 0.3s ease',
-                zIndex: 1000,
+                zIndex: 1200,
                 '&:hover': {
                     width: isMobile ? '90px' : '240px',
                     '& .MuiListItemText-root, & .adsh-title': {
@@ -61,10 +69,11 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                         opacity: isMobile ? 0 : 1,
                     },
                 },
+                boxShadow: isDarkMode ? '' : '1px 0 8px rgba(0, 0, 0, 0.1)', 
             }}
         >
             <Box role="presentation">
-                <Box display={'flex'} justifyContent={'left'} alignItems={'center'}>
+                <Box display={'flex'} justifyContent={'left'} alignItems={'center'} marginTop={'17px'}>
                     <img
                         src="https://adsdesk.adscodegensolutions.com/ads/photos/ads_logo_only.png"
                         alt="Logo"
@@ -94,7 +103,8 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                             color: isDarkMode ? '#cfc8e3' : '#536880',
                             opacity: isCollapsed ? 0 : 1,
                             transition: 'opacity 0.3s ease',
-                            display: isMobile ? 'none' : 'block', // Hide title on mobile
+                            display: isMobile ? 'none' : 'block',
+                            fontWeight: "bold",
                         }}
                     >
                         ADSHR
@@ -108,14 +118,15 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                             onClose(); // Close sidebar when toggling
                         }}
                         sx={{
-                            border: '8px solid',
-                            height: '50px',
-                            width: '50px',
+                            marginLeft: 0.3,
+                            border: '7px solid',
+                            height: '40px',
+                            width: '40px',
                             borderColor: isDarkMode ? '#232333' : '#f6f5fa',
                             borderRadius: '50%',
-                            bgcolor: isDarkMode ? '#8000ff' : '#8000ff',
+                            bgcolor: isDarkMode ? '#696cff' : '#696cff',
                             '&:hover': {
-                                bgcolor: isDarkMode ? '#8000ff' : '#8000ff',
+                                bgcolor: isDarkMode ? '#696cff' : '#696cff',
                             },
                             opacity: isCollapsed ? 0 : 1,
                         }}
@@ -142,7 +153,7 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                                     }
                                 }}
                             >
-                                <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
+                                <ListItemIcon sx={{marginLeft:"10px" , color: isDarkMode ? '#c4bdd9' : '#67798f'}}>
                                     {item === 'Dashboard' && <GridIcon />}
                                     {item === 'Employee' && <PersonIcon />}
                                 </ListItemIcon>
@@ -171,7 +182,7 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                                             onClick={() => handleItemClick(childItem)}
                                         >
                                             <ListItemIcon sx={{ justifyContent: 'center', color: isDarkMode ? '#9b94b0' : '#67798f' }}>
-                                                <FiberManualRecordIcon fontSize="small" />
+                                                <FiberManualRecordIcon fontSize='10px' />
                                             </ListItemIcon>
                                             <ListItemText
                                                 primary={childItem}

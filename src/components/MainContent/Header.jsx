@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -20,25 +20,42 @@ import {
     Brightness7,
     Menu as MenuIcon,
 } from '@mui/icons-material';
-import { useTheme } from '../ThemeContext';
-import Sidebar from '../Sidebar/Sidebar';
+import { useTheme } from '../ThemeContext'; // Custom hook to manage dark mode
+import Sidebar from '../Sidebar/Sidebar'; // Assuming this is a sidebar component
 import MainContent from './MainContent';
 
 const Header = ({ onLogout }) => {
     const [anchorElUser, setAnchorElUser] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(false); 
+    const [sidebarOpen, setSidebarOpen] = useState(true); // Default state
     const { isDarkMode, toggleTheme } = useTheme();
     const isMobile = useMediaQuery('(max-width: 768px)');
     const isMedium = useMediaQuery('(max-width: 1024px)');
+    const [scrollDirection, setScrollDirection] = useState('none');
 
-    const user = {
-        name: 'Vijay Hadiyal',
-        email: 'vijayhadiyal7777@outlook.com',
-        avatarUrl: 'https://avatars.githubusercontent.com/u/19550456',
-    };
+    // Fetch the username from localStorage (stored during login or registration)
+    const username = localStorage.getItem('username') || 'Guest'; // Default to 'Guest' if not found
+
+    // Extract the first letter of the username
+    const firstLetter = username.charAt(0).toUpperCase();
+
+    // Check if the sidebar state is saved in localStorage on mount
+    useEffect(() => {
+        const savedSidebarState = localStorage.getItem('sidebarOpen');
+        if (savedSidebarState) {
+            setSidebarOpen(JSON.parse(savedSidebarState));
+        }
+    }, []);
 
     const toggleSidebar = () => {
-        setSidebarOpen((prev) => !prev);
+        const newState = !sidebarOpen;
+        setSidebarOpen(newState);
+
+        // Save the sidebar state in localStorage
+        localStorage.setItem('sidebarOpen', JSON.stringify(newState));
+    };
+
+    const toggleScroll = (direction) => {
+        setScrollDirection(direction);
     };
 
     const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
@@ -56,16 +73,21 @@ const Header = ({ onLogout }) => {
             }}
         >
             {/* Sidebar Component */}
-            <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
+            <Sidebar open={sidebarOpen} onClose={toggleSidebar} toggleScroll={toggleScroll} />
 
             <AppBar
                 sx={{
                     bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                     color: isDarkMode ? '#fff' : '#000',
-                    width: isMobile ? '100%' : 'calc(100% - 240px)',
-                    ml: isMobile ? 0 : (sidebarOpen && isMedium ? '240px' : 0), // Adjust margin for sidebar width
+                    width: isMobile ? '100%' : `calc(100% - ${sidebarOpen ? '288px' : '143px'})`,
+                    ml: isMobile ? 0 : sidebarOpen ? '240px' : 0,
                     borderRadius: isMobile ? 0 : 2,
-                    mt: isMobile ? 0 : 3,
+                    mt: isMobile ? 0 : 2,
+                    mr: 3,
+                    zIndex: 1100,
+                    transition: 'all 0.3s ease-in-out',
+
+
                 }}
             >
                 <Toolbar sx={{ minHeight: 56, px: 2 }}>
@@ -106,7 +128,9 @@ const Header = ({ onLogout }) => {
                     </Tooltip>
                     <Tooltip title="Settings">
                         <IconButton size="large" onClick={handleOpenUserMenu}>
-                            <Avatar alt={user.name} src={user.avatarUrl} />
+                            <Avatar alt={username} sx={{ bgcolor: isDarkMode ? '#424242' : '#1976d2' }}>
+                                {firstLetter}
+                            </Avatar>
                         </IconButton>
                     </Tooltip>
                     <Menu
@@ -122,10 +146,12 @@ const Header = ({ onLogout }) => {
                     </Menu>
                 </Toolbar>
             </AppBar>
+            {/* <div style={{ marginTop: "50px", marginLeft: "100px" }}>
+                <h1>Dashboard</h1>
+            </div> */}
 
             {/* Main Content Area */}
-            <MainContent />
-
+            <MainContent sidebarOpen={sidebarOpen} />
         </Box>
     );
 };

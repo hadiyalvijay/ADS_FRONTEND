@@ -1,105 +1,98 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import {
-    Box,
-    AppBar,
-    Toolbar,
-    IconButton,
-    Avatar,
-    Tooltip,
-    Menu,
-    MenuItem,
-    TextField,
-    useMediaQuery,
-} from '@mui/material';
-import {
-    Search,
-    Notifications,
-    Brightness4,
-    Brightness7,
-    Menu as MenuIcon,
-} from '@mui/icons-material';
+import { Grid, Paper } from '@mui/material';
+import ActivityTimeline from '../ActivityTimeline/ActivityTimeline';
+import Timesheet from '../Timesheet/Timesheet';
+import Statistics from '../Statistics/Statistics';
 import { useTheme } from '../ThemeContext';
-import Sidebar from '../Sidebar/Sidebar';
-import MainContent from './MainContent';
 
-const Header = ({ onLogout }) => {
-    const [anchorElUser, setAnchorElUser] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(false); 
-    const { isDarkMode, toggleTheme } = useTheme();
-    const isMobile = useMediaQuery('(max-width: 768px)');
-    const isMedium = useMediaQuery('(max-width: 1024px)');
+const MainContent = ({ sidebarOpen }) => {
+  const { isDarkMode } = useTheme();
 
-    const user = {
-        name: 'Vijay Hadiyal',
-        email: 'vijayhadiyal7777@outlook.com',
-        avatarUrl: 'https://avatars.githubusercontent.com/u/19550456',
-    };
+  // Lifted state for activity log
+  const [activityLog, setActivityLog] = useState([]);
+  // Lifted state for time tracking
+  const [workTime, setWorkTime] = useState(0);
+  const [lunchTime, setLunchTime] = useState(0);
+  const [breakTime, setBreakTime] = useState(0);
+  const [totalWorkTime, setTotalWorkTime] = useState(0);
 
-    const toggleSidebar = () => {
-        setSidebarOpen((prev) => !prev);
-    };
+  const logActivity = (action) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setActivityLog((prevLog) => [
+      ...prevLog,
+      { time: timestamp, description: action },  // Add both time and action
+    ]);
+  };
 
-    const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
-    const handleCloseUserMenu = () => setAnchorElUser(null);
+  return (
+    <Grid
+      container
+      spacing={3}
+      justifyContent="space-between"
+      alignItems="stretch"
+      sx={{
+        marginTop: 15,
+        marginLeft: sidebarOpen ? '240px' : '90px',
+        transition: 'all 0.3s ease-in-out',
+        marginRight: 3.2,
+        color: isDarkMode ? '#c7c7df' : '#566a7f',
+      }}
+    >
+      {/* Timesheet Component */}
+      <Grid item xs={12} sm={6} md={4}>
+        <Paper
+          elevation={3}
+          sx={{
+            bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+            color: isDarkMode ? '#c7c7df' : '#566a7f',
+          }}
+        >
+          <Timesheet
+            setActivityLog={setActivityLog}
+            logActivity={logActivity}
+            activityLog={activityLog}
+            setWorkTime={setWorkTime}
+            setLunchTime={setLunchTime}
+            setBreakTime={setBreakTime}
+            setTotalWorkTime={setTotalWorkTime}
+          />
+        </Paper>
+      </Grid>
 
-    const scrollHeader = (direction) => {
-        const headerElement = document.getElementById('header'); // Ensure your header has this id
-        if (direction === 'left') {
-            headerElement.scrollLeft += 200; // Adjust the value as needed for speed
-        } else {
-            headerElement.scrollLeft -= 200; // Adjust the value as needed for speed
-        }
-    };
+      {/* Statistics Component */}
+      <Grid item xs={12} sm={6} md={4}>
+        <Paper
+          elevation={3}
+          sx={{
+            bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+            color: isDarkMode ? '#c7c7df' : '#566a7f',
+          }}
+        >
+          <Statistics
+            statsData={[
+              { label: 'Work Time', value: `${Math.floor(workTime / 3600)}h ${Math.floor((workTime % 3600) / 60)}m`, progress: (workTime / 28800) * 100, color: 'primary' },
+              { label: 'Lunch Time', value: `${Math.floor(lunchTime / 3600)}h ${Math.floor((lunchTime % 3600) / 60)}m`, progress: (lunchTime / 3600) * 100, color: 'secondary' },
+              { label: 'Break Time', value: `${Math.floor(breakTime / 3600)}h ${Math.floor((breakTime % 3600) / 60)}m`, progress: (breakTime / 3600) * 100, color: 'success' },
+              { label: 'Total Work Time', value: `${Math.floor(totalWorkTime / 3600)}h ${Math.floor((totalWorkTime % 3600) / 60)}m`, progress: (totalWorkTime / 28800) * 100, color: 'primary' },
+            ]}
+          />
+        </Paper>
+      </Grid>
 
-    return (
-        <>
-            <AppBar position="static" sx={{ zIndex: 1301, transition: 'transform 0.3s ease', bgcolor: isDarkMode ? '#2a2b40' : '#fff' }} id="header">
-                <Toolbar>
-                    <IconButton color="inherit" onClick={toggleSidebar}>
-                        <MenuIcon />
-                    </IconButton>
-
-                    <Box flexGrow={1} display="flex" alignItems="center">
-                        <TextField placeholder="Search…" variant="outlined" size="small" sx={{ marginRight: 2 }} />
-                        <IconButton color="inherit">
-                            <Search />
-                        </IconButton>
-                    </Box>
-
-                    <IconButton color="inherit" onClick={toggleTheme}>
-                        {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-                    </IconButton>
-
-                    <IconButton color="inherit">
-                        <Notifications />
-                    </IconButton>
-
-                    <Tooltip title="Open settings">
-                        <IconButton onClick={handleOpenUserMenu}>
-                            <Avatar alt={user.name} src={user.avatarUrl} />
-                        </IconButton>
-                    </Tooltip>
-
-                    <Menu
-                        anchorEl={anchorElUser}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                    >
-                        <MenuItem onClick={onLogout}>Logout</MenuItem>
-                    </Menu>
-                </Toolbar>
-            </AppBar>
-
-            <Sidebar open={sidebarOpen} onClose={toggleSidebar} toggleScroll={scrollHeader} />
-
-            <MainContent />
-        </>
-    );
+      {/* ActivityTimeline Component */}
+      <Grid item xs={12} sm={6} md={4}>
+        <Paper
+          elevation={3}
+          sx={{
+            bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+            color: isDarkMode ? '#c7c7df' : '#566a7f',
+          }}
+        >
+          <ActivityTimeline activityLog={activityLog} />
+        </Paper>
+      </Grid>
+    </Grid>
+  );
 };
 
-Header.propTypes = {
-    onLogout: PropTypes.func.isRequired,
-};
-
-export default Header;
+export default MainContent;

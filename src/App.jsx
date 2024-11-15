@@ -1,69 +1,73 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-// import SignIn from './SignIn/signin'; 
-import Header from './components/MainContent/Header'; 
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import SignIn from './components/SignIn/signin';
+import Header from './components/MainContent/Header';
 
-// Define your theme object
 const demoTheme = {
-    colors: {
-        primary: '#007bff',
-        secondary: '#6c757d',
-        success: '#28a745',
-        danger: '#dc3545',
-        warning: '#ffc107',
-        info: '#17a2b8',
-        light: '#f8f9fa',
-        dark: '#343a40',
-        background: '#ffffff',
-        text: '#212529', 
-    },
-    spacing: (factor) => `${0.25 * factor}rem`, 
+  colors: {
+    primary: '#007bff',
+    secondary: '#6c757d',
+    success: '#28a745',
+    danger: '#dc3545',
+    warning: '#ffc107',
+    info: '#17a2b8',
+    light: '#f8f9fa',
+    dark: '#343a40',
+    background: '#ffffff',
+    text: '#212529',
+  },
+  spacing: (factor) => `${0.25 * factor}rem`,
 };
 
-// Main App component
 const App = () => {
-    const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(() => {
+    const storedSignInStatus = localStorage.getItem('isSignedIn');
+    return storedSignInStatus === 'true'; // Check if the value in localStorage is 'true'
+  });
 
-    useEffect(() => {
-        const loggedInStatus = localStorage.getItem('isLoggedIn') === 'true';
-        setIsSignedIn(loggedInStatus);
-    }, []);
+  const [username, setUsername] = useState(localStorage.getItem('username') || '');
 
-    const handleSignIn = () => {
-        setIsSignedIn(true);
-        localStorage.setItem('isLoggedIn', 'true');
-    };
+  useEffect(() => {
+    // Whenever the `isSignedIn` state changes, update localStorage
+    localStorage.setItem('isSignedIn', isSignedIn ? 'true' : 'false');
+    if (isSignedIn && username) {
+      localStorage.setItem('username', username); // Save username if signed in
+    }
+  }, [isSignedIn, username]);
 
-    const handleSignOut = () => {
-        setIsSignedIn(false);
-        localStorage.removeItem('isLoggedIn');
-    };
+  const handleSignIn = (username) => {
+    setIsSignedIn(true);
+    setUsername(username); 
+  };
 
-    return (
-        <ThemeProvider theme={demoTheme}>
-            <Router>
-                <>
-                    {isSignedIn ? (
-                        <>
-                            <Header onLogout={handleSignOut} />
-                            <Routes>
-                                <Route path="/" element={<div>Welcome to the dashboard!</div>} /> {/* Add your main component here */}
-                                <Route path="*" element={<Navigate to="/" />} />
-                            </Routes>
-                        </>
-                    ) : (
-                        <Routes>
-                            <Route path="/" element={<SignIn onSignIn={handleSignIn} />} />
-                            <Route path="*" element={<Navigate to="/" />} />
-                        </Routes>
-                    )}
-                </>
-            </Router>
-        </ThemeProvider>
-    );
+  const handleSignOut = () => {
+    setIsSignedIn(false);
+    setUsername(''); 
+    localStorage.removeItem('username');
+    localStorage.removeItem('token');
+  };
+
+  return (
+    <ThemeProvider theme={demoTheme}>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isSignedIn ? (
+                <Header username={username} onLogout={handleSignOut} />
+              ) : (
+                <SignIn onSignIn={handleSignIn} />
+              )
+            }
+          />
+          {/* Redirect to home if not found */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
+  );
 };
 
 export default App;

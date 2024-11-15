@@ -24,34 +24,43 @@ const SignIn = ({ onSignIn }) => {
         e.preventDefault();
 
         if (isSignIn) {
-            // Sign In logic
             try {
-                const response = await axios.post('http://localhost:5000/api/auth/login', {
-                    email,
-                    password,
-                });
-
+                const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
                 const { token } = response.data;
                 localStorage.setItem('token', token);
+                localStorage.setItem('username', username);
                 onSignIn();
                 navigate('/home');
             } catch (error) {
-                setErrorMessage('Invalid email or password. Please try again.');
+                if (error.response && error.response.data) {
+                    setErrorMessage(error.response.data.msg || 'Invalid email or password. Please try again.');
+                } else {
+                    setErrorMessage('An error occurred. Please try again.');
+                }
                 setOpenSnackbar(true);
             }
         } else {
-            // Registration logic
             try {
                 const newUser = { username, email, password };
-                await axios.post('http://localhost:5000/api/auth/register', newUser);
+                const response = await axios.post('http://localhost:5000/api/auth/register', newUser);
+                const { token, username: registeredUsername } = response.data;
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', registeredUsername);
+                setUsername(registeredUsername);
                 setErrorMessage('Registration successful. You can now sign in.');
                 setOpenSnackbar(true);
                 setIsSignIn(true);
-                setUsername(''); 
-                setEmail('');    // Reset the email field after successful registration
-                setPassword(''); // Reset the password field after successful registration
             } catch (error) {
-                setErrorMessage('Registration failed. Please try again.');
+                if (error.response && error.response.data) {
+                    // Check for the case where user already exists
+                    if (error.response.data.msg === 'User already exists') {
+                        setErrorMessage('User already exists. Please try Signing in.');
+                    } else {
+                        setErrorMessage('Registration failed. Please try again.');
+                    }
+                } else {
+                    setErrorMessage('An error occurred during registration.');
+                }
                 setOpenSnackbar(true);
             }
         }
@@ -62,12 +71,29 @@ const SignIn = ({ onSignIn }) => {
     };
 
     return (
-        <Box display="flex" height="90vh" width="100%">
-            <Box 
-              
-                sx={{ display: { xs: 'none', lg: 'block' }, flex: 1, backgroundSize: 'cover', backgroundPosition: 'center', backgroundImage:"url('https://virtualdev.co/wp-content/uploads/virtual-developer-illustration-full-scale.webp')"}} 
+        <Box
+            display="flex"
+            height="97vh"
+            sx={{
+                flexDirection: { xs: 'column', lg: 'row' },
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            {/* Image Side */}
+            <Box
+                sx={{
+                    display: { xs: 'none', lg: 'block' },
+                    flex: 1,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundImage: "url('https://virtualdev.co/wp-content/uploads/virtual-developer-illustration-full-scale.webp')",
+                    height: '100vh', // Ensure full height for large screens
+                }}
             />
-            <Box sx={{ width: '2px', height: '99vh', marginRight: '50px', backgroundColor: '#eaeded', marginBottom: 1, boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)' }} />
+            <Box sx={{ width: '2px', height: '99vh', marginRight: { lg: '50px', xs: '0' }, backgroundColor: '#eaeded', marginBottom: 1, boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)' }} />
+
+            {/* Sign In Form */}
             <Box
                 id="signin-form"
                 component={Paper}
@@ -77,12 +103,13 @@ const SignIn = ({ onSignIn }) => {
                 justifyContent="center"
                 alignItems="center"
                 flex="0.5"
-                padding={4}
+                padding={{ xs: 3, sm: 4 }}
                 bgcolor="white"
                 borderRadius={4}
-                marginTop="80px"
+                marginTop={{ xs: '20px', lg: '10px' }}
                 marginRight="40px"
                 sx={{
+                    width: { xs: '90%', sm: '80%', md: '70%', lg: '50%' },
                     cursor: 'pointer',
                     animation: 'pulse 1s ease-in-out infinite, zoom-in 0.5s ease-out',
                     transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
@@ -90,28 +117,31 @@ const SignIn = ({ onSignIn }) => {
                     '@keyframes pulse': {
                         '0%': { transform: 'scale(1)' },
                         '50%': { transform: 'scale(1.02)' },
-                        '100%': { transform: 'scale(1)' }
+                        '100%': { transform: 'scale(1)' },
                     },
                     '@keyframes zoom-in': {
                         '0%': { transform: 'scale(0.8)', opacity: 0 },
-                        '100%': { transform: 'scale(1)', opacity: 1 }
-                    }
+                        '100%': { transform: 'scale(1)', opacity: 1 },
+                    },
                 }}
             >
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', maxWidth: 400, padding: 3, bgcolor: 'white' }}>
-                    <Avatar
-                        style={avatarStyle}
-                        sx={{
-                            width: 60,
-                            height: 60,
-                            mb: 2,
-                            transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-                            '&:hover': { transform: 'scale(1.2) rotate(360deg)', boxShadow: '0 0 15px rgba(27, 189, 126, 0.5)' }
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', padding: 1 }}>
+                    <img
+                        src="https://adsdesk.adscodegensolutions.com/ads/photos/ads_logo_only.png"
+                        alt="ADS Logo"
+                        style={{
+                            width: '200px', // Adjust the size as needed
+                            marginBottom: '20px', // Space between logo and form
                         }}
+                    />
+                    <Typography
+                        variant="h4"
+                        component="h1"
+                        fontWeight="bold"
+                        marginBottom={3}
+                        textAlign="center"
+                        sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }} // Responsive font size
                     >
-                        <LockOutlinedIcon fontSize="large" />
-                    </Avatar>
-                    <Typography variant="h4" component="h1" fontWeight="bold" marginBottom={3} textAlign="center">
                         {isSignIn ? 'Sign In' : 'Sign Up'}
                     </Typography>
                     <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -145,24 +175,41 @@ const SignIn = ({ onSignIn }) => {
                             onChange={(e) => setPassword(e.target.value)}
                             fullWidth
                         />
-                        <Button type="submit" variant="contained" color="primary" fullWidth size="large">
+                        <Button type="submit" variant="contained" fontWeight="bold" color="primary" fullWidth size="large">
                             {isSignIn ? 'Sign In' : 'Sign Up'}
                         </Button>
                     </form>
                     <Typography marginTop={3} textAlign="center">
-                        <Link href="#" color="primary" underline="none" onClick={() => navigate('/forgot-password')}>
+                        <Link href="#" color="primary" underline="none" fontWeight={'bold'} onClick={() => navigate('/forgot-password')}>
                             Forgot password?
                         </Link>
                     </Typography>
-                    <Typography marginTop={1} textAlign="center">
+                    <Typography
+                        marginTop={1}
+                        textAlign="center"
+                        sx={{
+                            fontSize: { xs: '0.875rem', sm: '1rem', md: '1.1rem' },
+                            padding: { xs: '0 16px', sm: '0' },
+                        }}
+                    >
                         {isSignIn ? "Don't have an account?" : "Already have an account?"}{' '}
-                        <Link href="#" color="primary" underline="none" onClick={() => setIsSignIn(!isSignIn)}>
+                        <Link
+                            href="#"
+                            color="primary"
+                            underline="none"
+                            onClick={() => setIsSignIn(!isSignIn)}
+                            sx={{
+                                display: 'inline-block',
+                                fontWeight: 'bold',
+                            }}
+                        >
                             {isSignIn ? 'Sign Up' : 'Sign In'}
                         </Link>
                     </Typography>
                 </Box>
             </Box>
 
+            {/* Snackbar for error messages */}
             <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={handleCloseSnackbar} message={errorMessage} />
         </Box>
     );

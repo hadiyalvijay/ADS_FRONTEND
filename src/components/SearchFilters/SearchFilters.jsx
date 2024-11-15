@@ -1,4 +1,3 @@
-// src/components/SearchFilters/SearchFilters.js
 import React from 'react';
 import { Box, TextField, Button, Grid } from '@mui/material';
 import { useTheme } from '../ThemeContext';
@@ -13,10 +12,9 @@ const SearchFilters = () => {
                 bgcolor: isDarkMode ? '#2a2b40' : '#fff', // Background color based on theme
                 color: isDarkMode ? '#fff' : '#000', // Text color based on theme
                 borderRadius: 2,
-                // mt: 2,
             }}
         >
-            <Grid container spacing={2}>
+            <Grid container spacing={2} justifyContent="space-between">
                 <Grid item xs={12} sm={3}>
                     <TextField
                         fullWidth
@@ -49,6 +47,7 @@ const SearchFilters = () => {
                         }}
                     />
                 </Grid>
+
                 <Grid item xs={12} sm={3}>
                     <TextField
                         fullWidth
@@ -59,7 +58,7 @@ const SearchFilters = () => {
                                 bgcolor: '#fff',
                                 color: '#000',
                                 border: '1px solid #ccc',
-                                height: '50px', 
+                                height: '50px',
                                 textAlign: 'center',
                                 '& .MuiInputBase-input': {
                                     textAlign: 'center', // Center-align input text
@@ -81,6 +80,7 @@ const SearchFilters = () => {
                         }}
                     />
                 </Grid>
+
                 <Grid item xs={12} sm={3}>
                     <TextField
                         fullWidth
@@ -91,7 +91,7 @@ const SearchFilters = () => {
                                 bgcolor: '#fff',
                                 color: '#000',
                                 border: '1px solid #ccc',
-                                height: '50px', 
+                                height: '50px',
                                 textAlign: 'center',
                                 '& .MuiInputBase-input': {
                                     textAlign: 'center', // Center-align input text
@@ -113,17 +113,17 @@ const SearchFilters = () => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={3} mt={0.3}> 
+
+                <Grid item xs={12} sm={3} mt={0.3}>
                     <Button
                         fullWidth
                         variant="contained"
                         sx={{
-                            width: '70%', // Set width to 70% of its parent
                             height: '40px', // Maintain height
                             bgcolor: isDarkMode ? '#00f53d' : '#000',
                             color: '#fff',
                             '&:hover': {
-                                bgcolor: isDarkMode ? '#00b030' : '#000',
+                                bgcolor: isDarkMode ? '#00b030' : '#333',
                             },
                         }}
                     >
