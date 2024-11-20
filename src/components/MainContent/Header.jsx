@@ -1,93 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
-import {
-    Box,
-    AppBar,
-    Toolbar,
-    IconButton,
-    Avatar,
-    Tooltip,
-    Menu,
-    MenuItem,
-    TextField,
-    useMediaQuery,
-} from '@mui/material';
-import {
-    Search,
-    Notifications,
-    Brightness4,
-    Brightness7,
-    Menu as MenuIcon,
-} from '@mui/icons-material';
-import { useTheme } from '../ThemeContext'; // Custom hook to manage dark mode
-import Sidebar from '../Sidebar/Sidebar'; // Assuming this is a sidebar component
-import MainContent from './MainContent';
+import { Box, AppBar, Toolbar, IconButton, Avatar, Tooltip, Menu, MenuItem, TextField, useMediaQuery } from '@mui/material';
+import { Search, Notifications, Brightness4, Brightness7, Menu as MenuIcon } from '@mui/icons-material';
+import { useTheme } from '../ThemeContext';
+import Sidebar from '../Sidebar/Sidebar';
 
-const Header = ({ onLogout }) => {
+const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
     const [anchorElUser, setAnchorElUser] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(true); // Default state
     const { isDarkMode, toggleTheme } = useTheme();
     const isMobile = useMediaQuery('(max-width: 768px)');
-    const isMedium = useMediaQuery('(max-width: 1024px)');
-    const [scrollDirection, setScrollDirection] = useState('none');
-
-    // Fetch the username from localStorage (stored during login or registration)
-    const username = localStorage.getItem('username') || 'Guest'; // Default to 'Guest' if not found
-
-    // Extract the first letter of the username
+    const username = localStorage.getItem('username') || 'Guest';
     const firstLetter = username.charAt(0).toUpperCase();
 
-    // Check if the sidebar state is saved in localStorage on mount
     useEffect(() => {
         const savedSidebarState = localStorage.getItem('sidebarOpen');
         if (savedSidebarState) {
-            setSidebarOpen(JSON.parse(savedSidebarState));
+            sidebarOpen = JSON.parse(savedSidebarState);
         }
-    }, []);
-
-    const toggleSidebar = () => {
-        const newState = !sidebarOpen;
-        setSidebarOpen(newState);
-
-        // Save the sidebar state in localStorage
-        localStorage.setItem('sidebarOpen', JSON.stringify(newState));
-    };
-
-    const toggleScroll = (direction) => {
-        setScrollDirection(direction);
-    };
+    }, [sidebarOpen]);
 
     const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
     const handleCloseUserMenu = () => setAnchorElUser(null);
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                height: '100vh',
-                width: '100vw',
-                backgroundColor: isDarkMode ? '#232333' : '#f5f5f9',
-                margin: -1,
-            }}
-        >
-            {/* Sidebar Component */}
-            <Sidebar open={sidebarOpen} onClose={toggleSidebar} toggleScroll={toggleScroll} />
-
+        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             <AppBar
                 sx={{
+                    position: "static",
                     bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                     color: isDarkMode ? '#fff' : '#000',
-                    width: isMobile ? '100%' : `calc(100% - ${sidebarOpen ? '288px' : '143px'})`,
-                    ml: isMobile ? 0 : sidebarOpen ? '240px' : 0,
-                    borderRadius: isMobile ? 0 : 2,
+                    borderRadius: isMobile ? 0 : 1,
                     mt: isMobile ? 0 : 2,
-                    mr: 3,
                     zIndex: 1100,
-                    transition: 'all 0.3s ease-in-out',
-
-
+                    transition: 'width 0.3s ease, margin-left 0.3s ease',
                 }}
             >
                 <Toolbar sx={{ minHeight: 56, px: 2 }}>
@@ -95,8 +40,8 @@ const Header = ({ onLogout }) => {
                         edge="start"
                         color="inherit"
                         aria-label="menu"
-                        onClick={toggleSidebar} // Toggle sidebar on click
-                        sx={{ mr: 2, display: { xs: 'block', sm: 'none' } }} // Only show on mobile
+                        onClick={toggleSidebar}
+                        sx={{ mr: 2, display: { xs: 'block', sm: 'none' } }}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -134,7 +79,7 @@ const Header = ({ onLogout }) => {
                         </IconButton>
                     </Tooltip>
                     <Menu
-                        sx={{ mt: '45px' }}
+                        sx={{ mt: '55px', ml: '12px' }}
                         anchorEl={anchorElUser}
                         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                         keepMounted
@@ -146,18 +91,14 @@ const Header = ({ onLogout }) => {
                     </Menu>
                 </Toolbar>
             </AppBar>
-            {/* <div style={{ marginTop: "50px", marginLeft: "100px" }}>
-                <h1>Dashboard</h1>
-            </div> */}
-
-            {/* Main Content Area */}
-            <MainContent sidebarOpen={sidebarOpen} />
         </Box>
     );
 };
 
 Header.propTypes = {
     onLogout: PropTypes.func.isRequired,
+    sidebarOpen: PropTypes.bool.isRequired,
+    toggleSidebar: PropTypes.func.isRequired,
 };
 
 export default Header;

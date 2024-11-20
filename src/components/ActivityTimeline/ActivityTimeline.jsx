@@ -62,7 +62,7 @@ const ActivityTimeline = ({ activityLog }) => {
         {activityLog.length > 0 ? (
           activityLog.map((activity, index) => {
             const iconColorHSL = getDynamicColor(index);
-            const borderColorRGBA = hslToRgba(iconColorHSL, 0.5); // Apply 50% opacity to the border
+            const borderColorRGBA = hslToRgba(iconColorHSL, 0.5); 
 
             return (
               <div key={index}>

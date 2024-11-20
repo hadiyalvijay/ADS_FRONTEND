@@ -2,10 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-
+*{
+    margin: 0;
+    padding: 0;
+    top: 0;
+}
 #header {
     overflow-x: auto; /* Allow horizontal scrolling */
     white-space: nowrap; /* Prevent wrapping of children */
     scroll-behavior: smooth; /* Enable smooth scrolling */
 }
-
+.ADS{
+    background-image:url("./img/ads.png");
+    width: "100px";
+    height: auto;
+}

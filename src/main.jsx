@@ -1,12 +1,17 @@
 // src/index.js
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import App from './App';
-import { ThemeProvider } from './components/ThemeContext'; // Import your ThemeProvider
+import { ThemeProvider } from './components/ThemeContext';
 
-ReactDOM.render(
-    <ThemeProvider>
-        <App />
-    </ThemeProvider>,
-    document.getElementById('root')
+// Ensure the element with id="root" exists
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Root element with id 'root' not found in index.html");
+}
+
+ReactDOM.createRoot(rootElement).render(
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>
 );

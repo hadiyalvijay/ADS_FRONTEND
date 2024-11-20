@@ -1,28 +1,41 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Create Theme Context
 const ThemeContext = createContext();
 
-// Custom hook to use the ThemeContext
-export const useTheme = () => {
-  return useContext(ThemeContext);
-};
-
-// Theme Provider component
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Retrieve the theme preference from localStorage or default to false (light mode)
-    const savedTheme = localStorage.getItem('isDarkMode');
-    return savedTheme ? JSON.parse(savedTheme) : false; // Default is light mode
-  });
+  // Safely get the stored theme or default to false (light mode)
+  let initialTheme = false; // default to light mode
+  try {
+    const storedTheme = localStorage.getItem('isDarkMode');
+    if (storedTheme !== null) {
+      initialTheme = JSON.parse(storedTheme); // safely parse only if not null
+    }
+  } catch (error) {
+    console.error("Error reading theme from localStorage", error);
+  }
+
+  const [isDarkMode, setIsDarkMode] = useState(initialTheme);
 
   const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      // Store the new theme preference in localStorage
+      try {
+        localStorage.setItem('isDarkMode', JSON.stringify(newMode));
+      } catch (error) {
+        console.error("Error saving theme to localStorage", error);
+      }
+      return newMode;
+    });
   };
 
-  // Effect to update localStorage whenever the theme changes
+  // Synchronize the theme state with localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
+    try {
+      localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
+    } catch (error) {
+      console.error("Error saving theme to localStorage", error);
+    }
   }, [isDarkMode]);
 
   return (
@@ -31,3 +44,5 @@ export const ThemeProvider = ({ children }) => {
     </ThemeContext.Provider>
   );
 };
+
+export const useTheme = () => useContext(ThemeContext);

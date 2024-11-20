@@ -34,18 +34,18 @@ const Clock = ({ time, isDarkMode }) => {
                 <ProgressRing 
                     value={getTimeValue('hours')} 
                     label={labels.hours} 
-                    strokeColor={isDarkMode ? "#ff4500" : "#007bff"} 
+                    strokeColor={isDarkMode ? "#ff4500" : "#ea1c24"} 
                     max={24} 
                 />
                 <ProgressRing 
                     value={getTimeValue('minutes')} 
                     label={labels.minutes} 
-                    strokeColor={isDarkMode ? "#FFFF" : "#17a2b8"} 
+                    strokeColor={isDarkMode ? "#FFFF" : "#059814"} 
                 />
                 <ProgressRing 
                     value={getTimeValue('seconds')} 
                     label={labels.seconds} 
-                    strokeColor={isDarkMode ? "#FFFF" : "#28a745"} 
+                    strokeColor={isDarkMode ? "#389828" : "#696cff"} 
                 />
             </Box>
         </Box>
