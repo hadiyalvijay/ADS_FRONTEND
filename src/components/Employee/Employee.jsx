@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useTheme } from '../ThemeContext';
 import EmployeeModel from './EmployeeModel';
 import { Box } from '@mui/material';
+import Employeelist from './Employeelist';
 
 const Employee = () => {
   const { isDarkMode } = useTheme();
@@ -18,6 +19,12 @@ const Employee = () => {
       <Box sx={{ display: "flex", justifyContent: "end"}}>
 
         <EmployeeModel />
+
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "end"}}>
+
+        <Employeelist />
+        
       </Box>
     </div>
   );

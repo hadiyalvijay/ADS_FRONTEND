@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'typeface-cormorant-garamond';
 import 'typeface-saira-stencil-one';
+import Logo from "../../img/ads.png";
 
 const SignIn = ({ onSignIn }) => {
     const [username, setUsername] = useState('');
@@ -13,8 +14,16 @@ const SignIn = ({ onSignIn }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [isSignIn, setIsSignIn] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
 
-    const navigate = useNavigate("/Dashboard");
+    const navigate = useNavigate();
+
+    // Handle screen resize to toggle isMobile
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 900);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const formElement = document.getElementById('signin-form');
@@ -28,10 +37,10 @@ const SignIn = ({ onSignIn }) => {
             if (isSignIn) {
                 try {
                     const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-                    const { token } = response.data;
+                    const { token, username } = response.data;
                     localStorage.setItem('token', token);
                     localStorage.setItem('username', username);
-                    onSignIn();
+                    onSignIn(username);
                     navigate('/Dashboard');
                 } catch (error) {
                     if (error.response && error.response.data) {
@@ -54,11 +63,7 @@ const SignIn = ({ onSignIn }) => {
                     setIsSignIn(true);
                 } catch (error) {
                     if (error.response && error.response.data) {
-                        if (error.response.data.msg === 'User already exists') {
-                            setErrorMessage('User already exists. Please try Signing in.');
-                        } else {
-                            setErrorMessage('Registration failed. Please try again.');
-                        }
+                        setErrorMessage('User already exists. Please try Signing in.');
                     } else {
                         setErrorMessage('An error occurred during registration.');
                     }
@@ -83,18 +88,20 @@ const SignIn = ({ onSignIn }) => {
                 alignItems: 'center',
             }}
         >
-            {/* Image Side */}
-            <Box
-                sx={{
-                    display: { xs: 'none', lg: 'block' },
-                    flex: 1,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundImage: "url('https://virtualdev.co/wp-content/uploads/virtual-developer-illustration-full-scale.webp')",
-                    height: '100vh', // Ensure full height for large screens
-                }}
-            />
-            <Box sx={{ width: '2px', height: '102vh', marginRight: { lg: '50px', xs: '0' }, backgroundColor: '#eaeded', marginBottom: 1, boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)' }} />
+            {/* Only show the image side if not on mobile */}
+            {!isMobile && (
+                <Box
+                    sx={{
+                        display: { xs: 'none', lg: 'block' },
+                        flex: 1,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundImage: "url('https://virtualdev.co/wp-content/uploads/virtual-developer-illustration-full-scale.webp')",
+                        height: '100vh',
+                    }}
+                />
+            )}
+            <Box sx={{ width: { lg: '2px' }, height: '102vh', marginRight: { lg: '50px', xs: '0' }, backgroundColor: '#eaeded', boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)', display: isMobile ? 'none' : 'block' }} />
 
             {/* Sign In Form */}
             <Box
@@ -105,12 +112,11 @@ const SignIn = ({ onSignIn }) => {
                 flexDirection="column"
                 justifyContent="center"
                 alignItems="center"
-                flex="0.5"
+                flex={isMobile ? 1 : 0.5}
                 padding={{ xs: 3, sm: 4 }}
                 bgcolor="white"
                 borderRadius={4}
                 marginTop={{ xs: '20px', lg: '10px' }}
-                marginRight="40px"
                 sx={{
                     color: "#566a7f",
                     width: { xs: '90%', sm: '80%', md: '70%', lg: '50%' },
@@ -123,15 +129,12 @@ const SignIn = ({ onSignIn }) => {
                         '50%': { transform: 'scale(1.02)' },
                         '100%': { transform: 'scale(1)' },
                     },
-                    '@keyframes zoom-in': {
-                        '0%': { transform: 'scale(0.8)', opacity: 0 },
-                        '100%': { transform: 'scale(1)', opacity: 1 },
-                    },
                 }}
             >
+                {/* Form Content */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', padding: 1 }}>
                     <img
-                        src="https://adsdesk.adscodegensolutions.com/ads/photos/ads_logo_only.png"
+                        src={Logo}
                         alt="ADS Logo"
                         style={{
                             width: '170px',
@@ -139,7 +142,7 @@ const SignIn = ({ onSignIn }) => {
                     />
                     <Box
                         sx={{
-                            fontFamily: '"Saira Stencil One",  sans-serif',
+                            fontFamily: '"Saira Stencil One", sans-serif',
                             fontSize: '1.1rem',
                             color: '#aa1c21',
                         }}
@@ -153,10 +156,10 @@ const SignIn = ({ onSignIn }) => {
                             fontSize: 12,
                             color: '#aa1c21',
                             fontWeight: "bold"
-                        }}>
+                        }}
+                    >
                         Your Vision, Our Technology
                     </Box>
-
                     <Box sx={{ mb: 1, display: "flex", width: "100%", justifyContent: "start", fontSize: 20, fontFamily: "'Lexend', sans-serif" }}>
                         Welcome to ADSHR! 👋
                     </Box>
@@ -173,7 +176,6 @@ const SignIn = ({ onSignIn }) => {
                     >
                         {isSignIn ? 'Please sign-in to your account' : 'Please create account your account'}
                     </Typography>
-
                     <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {!isSignIn && (
                             <TextField
@@ -228,10 +230,7 @@ const SignIn = ({ onSignIn }) => {
                                 color: "#fff",
                                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                                 transition: 'box-shadow 0.3s ease-in-out',
-                                position: 'relative',
                             }}
-                            onMouseOver={(e) => e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)'}
-                            onMouseOut={(e) => e.target.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'}
                             disabled={loading}
                         >
                             {loading ? (
@@ -241,39 +240,40 @@ const SignIn = ({ onSignIn }) => {
                             )}
                         </Button>
                     </form>
-
-                    <Typography marginTop={3} textAlign="center">
-                        <Link href="#" color="primary" underline="none" fontWeight={'bold'} fontSize={15} onClick={() => navigate('/forgot-password')}>
-                            Forgot password?
-                        </Link>
-                    </Typography>
-                    <Typography
-                        marginTop={1}
-                        textAlign="center"
-                        sx={{
-                            fontSize: { xs: '0.999rem', sm: '0.5rem', md: '1rem' },
-                            padding: { xs: '0 16px', sm: '0' },
-                        }}
-                    >
-                        {isSignIn ? "Don't have an account?" : "Already have an account?"}{' '}
-                        <Link
-                            href="#"
-                            color="primary"
-                            underline="none"
-                            onClick={() => setIsSignIn(!isSignIn)}
-                            sx={{
-                                display: 'inline-block',
-                                fontWeight: 'bold',
-                            }}
-                        >
-                            {isSignIn ? 'Sign Up' : 'Sign In'}
-                        </Link>
+                    <Typography variant="body2" marginTop={2}>
+                        {isSignIn ? (
+                            <>
+                                New on our platform?{' '}
+                                <Link
+                                    underline="hover"
+                                    onClick={() => setIsSignIn(false)}
+                                    sx={{ color: '#666cff', cursor: 'pointer' }}
+                                >
+                                    Create an account
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                Already have an account?{' '}
+                                <Link
+                                    underline="hover"
+                                    onClick={() => setIsSignIn(true)}
+                                    sx={{ color: '#666cff', cursor: 'pointer' }}
+                                >
+                                    Sign in
+                                </Link>
+                            </>
+                        )}
                     </Typography>
                 </Box>
             </Box>
-
-            {/* Snackbar for error messages */}
-            <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={handleCloseSnackbar} message={errorMessage} />
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                message={errorMessage}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            />
         </Box>
     );
 };

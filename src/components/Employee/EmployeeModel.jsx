@@ -25,6 +25,7 @@ import {
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '../ThemeContext';
+import axios from 'axios';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return (
@@ -68,6 +69,50 @@ const EmployeeModal = () => {
     },
   });
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check if password and confirm password match
+    if (formData.password !== formData.confirmPassword) {
+      setError(true);
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/employees', formData);
+      const { token } = response.data;
+      localStorage.setItem('token', token);
+
+
+      setFormData({
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        department: '',
+        designation: '',
+        mobileNumber: '',
+        officeEmail: '',
+        personalEmail: '',
+        password: '',
+        confirmPassword: '',
+        technology: '',
+        skypeId: '',
+        employementType: '',
+        birthDate: '',
+        joiningDate: '',
+        aadharCard: '',
+        panCard: '',
+        gender: '',
+        role: '',
+        profilepic: '',
+      });
+      handleClose();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Optionally show an error message to the user
+    }
+  };
+
   const [formData, setFormData] = useState({
     firstName: '',
     middleName: '',
@@ -93,21 +138,17 @@ const EmployeeModal = () => {
   const [error, setError] = useState(false);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        profilepic: file.name,  // Store file name as string
-      }));
-      setError(false);
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        profilepic: '',  // Clear file name if no file is selected
-      }));
-      setError(true);
-    }
-  };
+  const file = e.target.files[0];
+  if (file.size > 5 * 1024 * 1024) { // 5 MB limit
+    alert('File size exceeds the 5MB limit');
+  } else {
+    setFormData(prev => ({
+      ...prev,
+      profilepic: file.name,
+    }));
+  }
+};
+
 
 
   const handleOpen = () => setOpen(true);
@@ -121,35 +162,12 @@ const EmployeeModal = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    handleClose();
-  };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   console.log('Form submitted:', formData);
+  //   handleClose();
+  // };
 
-  const handleReset = () => {
-    setFormData({
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      department: '',
-      designation: '',
-      mobileNumber: '',
-      officeEmail: '',
-      personalEmail: '',
-      password: '',
-      confirmPassword: '',
-      technology: '',
-      skypeId: '',
-      employementType: '',
-      birthDate: '',
-      joiningDate: '',
-      aadharCard: '',
-      panCard: '',
-      gender: ''
-    });
-    handleClose();
-  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -262,17 +280,17 @@ const EmployeeModal = () => {
                         value={formData.firstName}
                         onChange={handleChange}
                         placeholder="Please Enter First Name"
-                      // sx={{
-                      //   input: {
-                      //     color: isDarkMode ? 'text.primary' : 'text.primary'
-                      //   },
-                      //   '& .MuiInputBase-root': {
-                      //     transition: 'transform 0.2s ease',
-                      //     '&:focus-within': {
-                      //       transform: 'translateY(-2px)'
-                      //     }
-                      //   }
-                      // }}
+                        sx={{
+                          input: {
+                            color: isDarkMode ? 'text.primary' : 'text.primary'
+                          },
+                          '& .MuiInputBase-root': {
+                            transition: 'transform 0.2s ease',
+                            '&:focus-within': {
+                              transform: 'translateY(-2px)'
+                            }
+                          }
+                        }}
                       />
                     </Grid>
                   </Fade>
@@ -425,9 +443,9 @@ const EmployeeModal = () => {
                           label="Technology"
                         >
                           <MenuItem value="">Please select Technology</MenuItem>
-                          <MenuItem value="full-time">React Js</MenuItem>
-                          <MenuItem value="part-time">.Net</MenuItem>
-                          <MenuItem value="contract">Node Js</MenuItem>
+                          <MenuItem value="reactjs">React Js</MenuItem>
+                          <MenuItem value=".net">.Net</MenuItem>
+                          <MenuItem value="nodejs">Node Js</MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -436,13 +454,12 @@ const EmployeeModal = () => {
                   <Fade in={open} timeout={2000}>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        required
                         fullWidth
                         label="Skype ID"
                         name="skypeId"
                         value={formData.skypeId}
                         onChange={handleChange}
-                        placeholder="Please Enter SkypeId"
+                        placeholder="Enter Skype ID"
                       />
                     </Grid>
                   </Fade>
@@ -558,8 +575,8 @@ const EmployeeModal = () => {
                           label="ROLE"
                         >
                           <MenuItem value="">Please select Role</MenuItem>
-                          <MenuItem value="male">Director</MenuItem>
-                          <MenuItem value="female">Developer</MenuItem>
+                          <MenuItem value="director">Director</MenuItem>
+                          <MenuItem value="developer">Developer</MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -582,17 +599,17 @@ const EmployeeModal = () => {
                           }}
                           sx={{
                             '& input[type="file"]::-webkit-file-upload-button': {
-                              bgcolor: isDarkMode ? '#2a2b40' : '#fff',color: isDarkMode ? '#c7c7df' : '#566a7f' ,
+                              bgcolor: isDarkMode ? '#2a2b40' : '#fff', color: isDarkMode ? '#c7c7df' : '#566a7f',
                               border: 'none',
                               width: '130px',
                               margin: '-9px',
-                              
+
                               borderRadius: '5px',
                               cursor: 'pointer',
                               fontWeight: 'bold',
                             },
                             '& input[type="file"]': {
-                              color: isDarkMode ? '#c7c7df' : '#778791' 
+                              color: isDarkMode ? '#c7c7df' : '#778791'
                             },
                             '& input[type="file"]::file-selector-button': {
                               marginRight: '20px',
@@ -613,6 +630,7 @@ const EmployeeModal = () => {
                       type="submit"
                       variant="contained"
                       color="primary"
+                      onClick={handleSubmit}
                       sx={{
                         transform: 'translateY(-2px)',
                         '&:hover': {
@@ -622,20 +640,6 @@ const EmployeeModal = () => {
                       }}
                     >
                       Save
-                    </Button>
-                    <Button
-                      onClick={handleReset}
-                      variant="contained"
-                      color="secondary"
-                      sx={{
-                        transform: 'translateY(-2px)',
-                        '&:hover': {
-                          transform: 'translateY(-4px)',
-                          transition: 'transform 0.3s ease'
-                        }
-                      }}
-                    >
-                      Reset
                     </Button>
                   </DialogActions>
                 </Grid>

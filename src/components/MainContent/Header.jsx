@@ -8,7 +8,7 @@ import Sidebar from '../Sidebar/Sidebar';
 const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const { isDarkMode, toggleTheme } = useTheme();
-    const isMobile = useMediaQuery('(max-width: 768px)');
+    const isMobile = useMediaQuery('(max-width: 1000px)');  
     const username = localStorage.getItem('username') || 'Guest';
     const firstLetter = username.charAt(0).toUpperCase();
 
@@ -17,7 +17,8 @@ const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
         if (savedSidebarState) {
             sidebarOpen = JSON.parse(savedSidebarState);
         }
-    }, [sidebarOpen]);
+    }, [toggleSidebar]);
+    
 
     const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
     const handleCloseUserMenu = () => setAnchorElUser(null);
@@ -36,15 +37,18 @@ const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
                 }}
             >
                 <Toolbar sx={{ minHeight: 56, px: 2 }}>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        onClick={toggleSidebar}
-                        sx={{ mr: 2, display: { xs: 'block', sm: 'none' } }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
+                    {/* Show the menu icon only on mobile screens */}
+                    {isMobile && (
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="menu"
+                            onClick={toggleSidebar}
+                            sx={{ mr: 2 }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                    )}
                     <Tooltip title="Search">
                         <IconButton size="large" aria-label="search" sx={{ color: isDarkMode ? '#fff' : '#000' }}>
                             <Search />

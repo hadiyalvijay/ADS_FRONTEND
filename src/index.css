@@ -2,18 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
+* {
     margin: 0;
     padding: 0;
     top: 0;
 }
+
 #header {
-    overflow-x: auto; /* Allow horizontal scrolling */
-    white-space: nowrap; /* Prevent wrapping of children */
-    scroll-behavior: smooth; /* Enable smooth scrolling */
+    overflow-x: auto;
+    /* Allow horizontal scrolling */
+    white-space: nowrap;
+    /* Prevent wrapping of children */
+    scroll-behavior: smooth;
+    /* Enable smooth scrolling */
 }
-.ADS{
-    background-image:url("./img/ads.png");
-    width: "100px";
+
+/* .ads{
+    background-image: url("./img/ads.png");
+    width: 100%;
     height: auto;
+    background-repeat: no-repeat;
+} */
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;  /* Overlay should be below the sidebar */
+    transition: opacity 0.3s ease;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.sidebar-overlay.open {
+    visibility: visible;
+    opacity: 1;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;  /* Initially hide the sidebar off-screen */
+    width: 250px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, z-index 0.3s ease;
+}
+
+.sidebar.open {
+    transform: translateX(0);
+    z-index: 1100;  /* Ensure the sidebar is on top */
 }

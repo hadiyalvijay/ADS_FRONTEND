@@ -17,6 +17,7 @@ import ChevronLeft from '@mui/icons-material/ChevronLeft';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import { useTheme } from '../ThemeContext'; // Adjust path as necessary
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import Logo from "../../img/ads.png"
 
 const Sidebar = ({ open, onClose, toggleScroll }) => {
   const { isDarkMode } = useTheme();
@@ -76,7 +77,7 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
     <Box
       ref={sidebarRef}
       sx={{
-        width: isCollapsed ? '80px' : '240px',
+        width: isCollapsed ? '80px' : '260px',
         height: '100vh',
         bgcolor: isDarkMode ? '#2a2b40' : '#ffffff',
         color: isDarkMode ? '#fff' : '#566a7f',
@@ -85,7 +86,7 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
         transition: 'width 0.3s ease',
         zIndex: 1200,
         '&:hover': {
-          width: isMobile ? '90px' : '240px',
+          width: isMobile ? '90px' : '260px',
           '& .MuiListItemText-root, & .adsh-title': {
             opacity: isMobile ? 0 : 1,
           },
@@ -99,11 +100,11 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
       <Box role="presentation">
         <Box display={'flex'} justifyContent={'left'} alignItems={'center'} marginTop={'17px'}>
           <img
-            src="https://adsdesk.adscodegensolutions.com/ads/photos/ads_logo_only.png"
+            src={Logo}
             alt="Logo"
             style={{
               width: '100%',
-              maxWidth: '100px',
+              maxWidth: '120px',
               height: 'auto',
               transition: 'transform 0.3s ease',
               cursor: 'pointer',
