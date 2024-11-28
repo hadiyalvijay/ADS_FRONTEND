@@ -27,7 +27,7 @@ const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             <AppBar
                 sx={{
-                    position: "fixed",
+                    position: "static",
                     bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                     color: isDarkMode ? '#fff' : '#000',
                     borderRadius: isMobile ? 0 : 1,
