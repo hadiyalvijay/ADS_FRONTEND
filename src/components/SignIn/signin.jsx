@@ -8,8 +8,8 @@ import Logo from "../../img/ads.png";
 
 const SignIn = ({ onSignIn }) => {
     const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('hadiyalvijay7777@gmail.com');
-    const [password, setPassword] = useState('123');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [isSignIn, setIsSignIn] = useState(true);
@@ -30,13 +30,14 @@ const SignIn = ({ onSignIn }) => {
         formElement.classList.add('zoom-in');
     }, []);
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setTimeout(async () => {
             if (isSignIn) {
                 try {
-                    const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+                    const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/login', { email, password });
                     const { token, username } = response.data;
                     localStorage.setItem('token', token);
                     localStorage.setItem('username', username);
@@ -53,7 +54,7 @@ const SignIn = ({ onSignIn }) => {
             } else {
                 try {
                     const newUser = { username, email, password };
-                    const response = await axios.post('http://localhost:5000/api/auth/register', newUser);
+                    const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/register', newUser);
                     const { token, username: registeredUsername } = response.data;
                     localStorage.setItem('token', token);
                     localStorage.setItem('username', registeredUsername);
@@ -71,7 +72,7 @@ const SignIn = ({ onSignIn }) => {
                 }
             }
             setLoading(false);
-        }, 2000);
+        }, 1000);
     };
 
     const handleCloseSnackbar = () => {

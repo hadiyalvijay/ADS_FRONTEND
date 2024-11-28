@@ -87,9 +87,10 @@ const App = () => {
                     <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
                   )}
                   <div style={{
+                    margin: '25px',
                     flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '0',
-                    marginRight: '25px',
+                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
+                    // marginRight: '25px',
                     marginTop: '5px',
                     marginBottom: '5px',
                     transition: 'margin-left 0.3s ease',
@@ -123,7 +124,7 @@ const App = () => {
                   )}
                   <div style={{
                     flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '0',
+                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
                     marginRight: '25px',
                     marginTop: '5px',
                     marginBottom: '5px',
@@ -154,7 +155,7 @@ const App = () => {
                   )}
                   <div style={{
                     flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '0',
+                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
                     marginRight: '25px',
                     marginTop: '5px',
                     marginBottom: '5px',

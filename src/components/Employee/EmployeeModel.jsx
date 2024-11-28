@@ -72,6 +72,9 @@ const EmployeeModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    
+
+
     // Check if password and confirm password match
     if (formData.password !== formData.confirmPassword) {
       setError(true);
@@ -79,7 +82,8 @@ const EmployeeModal = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/employees', formData);
+
+      const response = await axios.post('https://ads-server-rdvc.vercel.app/api/employees', formData);
       const { token } = response.data;
       localStorage.setItem('token', token);
 
@@ -138,16 +142,16 @@ const EmployeeModal = () => {
   const [error, setError] = useState(false);
 
   const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file.size > 5 * 1024 * 1024) { // 5 MB limit
-    alert('File size exceeds the 5MB limit');
-  } else {
-    setFormData(prev => ({
-      ...prev,
-      profilepic: file.name,
-    }));
-  }
-};
+    const file = e.target.files[0];
+    if (file.size > 5 * 1024 * 1024) { // 5 MB limit
+      alert('File size exceeds the 5MB limit');
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        profilepic: file.name,
+      }));
+    }
+  };
 
 
 

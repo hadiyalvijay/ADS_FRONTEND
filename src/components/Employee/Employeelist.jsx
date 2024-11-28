@@ -7,11 +7,16 @@ const Employeelist = ({ onEmployeeClick }) => {
     const [error, setError] = useState(null);  // Error state
 
     // Fetch employee data from API
+
     useEffect(() => {
+
+
+
         const fetchEmployeeData = async () => {
+
             setLoading(true);  // Set loading state before the request
             try {
-                const response = await axios.get('http://localhost:5000/api/employees');  // Use axios.get
+                const response = await axios.get('https://ads-server-rdvc.vercel.app/api/employees'); 
                 setEmployeeData(response.data);  // Update state with fetched data
             } catch (error) {
                 console.error('Error fetching employee data:', error);
@@ -28,7 +33,7 @@ const Employeelist = ({ onEmployeeClick }) => {
     const handleEmployeeClick = async (employee) => {
         const { _id } = employee; // Get employee id (using _id for MongoDB)
         try {
-            const response = await axios.get(`http://localhost:5000/api/employees/${_id}`);  // Use axios.get
+            const response = await axios.get(`https://ads-server-rdvc.vercel.app/api/employees/${_id}`);  // Use axios.get
             onEmployeeClick(response.data); // Pass the employee data to parent component
         } catch (error) {
             console.error('Error fetching employee details:', error);
