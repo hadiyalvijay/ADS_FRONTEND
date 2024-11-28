@@ -1,180 +1,103 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Sidebar from './components/Sidebar/Sidebar';
-import MainContent from './components/MainContent/MainContent';
-import Header from './components/MainContent/Header';
-import SignIn from './components/SignIn/signin';
-import { useTheme } from './components/ThemeContext';
-import { Box, useMediaQuery } from '@mui/material';
-import Employee from './components/Employee/Employee';
-import Attendance from './components/Attendance/Attendance';
+import PropTypes from 'prop-types';
+import { Box, AppBar, Toolbar, IconButton, Avatar, Tooltip, Menu, MenuItem, TextField, useMediaQuery } from '@mui/material';
+import { Search, Notifications, Brightness4, Brightness7, Menu as MenuIcon } from '@mui/icons-material';
+import { useTheme } from '../ThemeContext';
+import Sidebar from '../Sidebar/Sidebar';
 
-const App = () => {
-  const [isSignedIn, setIsSignedIn] = useState(() => {
-    const storedSignInStatus = localStorage.getItem('isSignedIn');
-    return storedSignInStatus === 'true';
-  });
+const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
+    const [anchorElUser, setAnchorElUser] = useState(null);
+    const { isDarkMode, toggleTheme } = useTheme();
+    const isMobile = useMediaQuery('(max-width: 1000px)');  
+    const username = localStorage.getItem('username') || 'Guest';
+    const firstLetter = username.charAt(0).toUpperCase();
 
-  const [username, setUsername] = useState(localStorage.getItem('username') || '');
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    const savedSidebarState = localStorage.getItem('sidebarOpen');
-    return savedSidebarState ? JSON.parse(savedSidebarState) : false; // Default to false (sidebar hidden)
-  });
+    useEffect(() => {
+        const savedSidebarState = localStorage.getItem('sidebarOpen');
+        if (savedSidebarState) {
+            sidebarOpen = JSON.parse(savedSidebarState);
+        }
+    }, [toggleSidebar]);
 
-  const { isDarkMode, toggleTheme } = useTheme();
-  const isMobile = useMediaQuery('(max-width: 900px)'); // Check if the screen size is under 900px
+    const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+    const handleCloseUserMenu = () => setAnchorElUser(null);
 
-  useEffect(() => {
-    localStorage.setItem('isDarkMode', isDarkMode);
-  }, [isDarkMode]);
-
-  // Toggle sidebar state
-  const toggleSidebar = () => {
-    const newState = !sidebarOpen;
-    setSidebarOpen(newState);
-    localStorage.setItem('sidebarOpen', JSON.stringify(newState));
-  };
-
-  const handleSignIn = (username) => {
-    console.log('Signing in with username:', username);
-    setIsSignedIn(true);
-    setUsername(username);
-    localStorage.setItem('username', username);
-    localStorage.setItem('isSignedIn', 'true');
-  };
-
-  const handleSignOut = () => {
-    setIsSignedIn(false);
-    setUsername('');
-    localStorage.removeItem('username');
-    localStorage.removeItem('isSignedIn');
-    localStorage.removeItem('token');
-  };
-
-  // Get the current date
-  const currentDate = new Date();
-  const dayName = currentDate.toLocaleString('en-US', { weekday: 'long' });
-  const dayNumber = currentDate.getDate();
-  const monthName = currentDate.toLocaleString('en-US', { month: 'long' });
-  const year = currentDate.getFullYear();
-
-  return (
-    <div>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isSignedIn ? (
-                <Navigate to="/Dashboard" />
-              ) : (
-                <SignIn onSignIn={handleSignIn} />
-              )
-            }
-          />
-          <Route
-            path="/Dashboard"
-            element={
-              isSignedIn ? (
-                <div style={{
-                  display: 'flex',
-                  backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
-                  margin: -8,
-                  overflow: 'hidden',
-                }}>
-                  {/* Show sidebar if screen width is larger than 900px or if the sidebar is toggled */}
-                  {(!isMobile || sidebarOpen) && (
-                    <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-                  )}
-                  <div style={{
-                    margin: '25px',
-                    flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
-                    // marginRight: '25px',
-                    marginTop: '5px',
-                    marginBottom: '5px',
-                    transition: 'margin-left 0.3s ease',
-                  }}>
-                    <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-                    <Box style={{ color: isDarkMode ? '#c7c7df' : '#566a83' }}>
-                      <h1>Welcome, {username}</h1>
-                      <p>{dayName}, {dayNumber} {monthName} {year}</p>
-                    </Box>
-                    <MainContent sidebarOpen={sidebarOpen} />
-                  </div>
-                </div>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/Employee/EmployeeList"
-            element={
-              isSignedIn ? (
-                <div style={{
-                  display: 'flex',
-                  backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
-                  margin: -8,
-                  overflow: 'hidden',
-                }}>
-                  {/* Show sidebar if screen width is larger than 900px or if the sidebar is toggled */}
-                  {(!isMobile || sidebarOpen) && (
-                    <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-                  )}
-                  <div style={{
-                    flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
-                    marginRight: '25px',
-                    marginTop: '5px',
-                    marginBottom: '5px',
-                    transition: 'margin-left 0.3s ease',
-                  }}>
-                    <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-                    <Employee />
-                  </div>
-                </div>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/Employee/Attendance/"
-            element={
-              isSignedIn ? (
-                <div style={{
-                  display: 'flex',
-                  backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
-                  margin: -8,
-                  overflow: 'hidden',
-                }}>
-                  {/* Show sidebar if screen width is larger than 900px or if the sidebar is toggled */}
-                  {(!isMobile || sidebarOpen) && (
-                    <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-                  )}
-                  <div style={{
-                    flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
-                    marginRight: '25px',
-                    marginTop: '5px',
-                    marginBottom: '5px',
-                    transition: 'margin-left 0.3s ease',
-                  }}>
-                    <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-                    <Attendance />
-                  </div>
-                </div>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Router>
-    </div>
-  );
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            <AppBar
+                sx={{
+                    position: "static",
+                    bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                    color: isDarkMode ? '#fff' : '#000',
+                    borderRadius: isMobile ? 0 : 1,
+                    mt: isMobile ? 0 : 2,
+                    zIndex: 1100,
+                    transition: 'width 0.3s ease, margin-left 0.3s ease',
+                    width: sidebarOpen ? 'calc(100% - 250px)' : '100%', // Adjust width based on sidebar
+                }}
+            >
+                <Toolbar sx={{ minHeight: 56, px: 2 }}>
+                    {/* Show the menu icon only on mobile screens */}
+                    {isMobile && (
+                        <IconButton
+                            size="large"
+                            edge="start"
+                            color="inherit"
+                            onClick={toggleSidebar}
+                            sx={{ mr: 2 }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                    )}
+                    <Box sx={{ flexGrow: 1 }} />
+                    <IconButton
+                        size="large"
+                        edge="end"
+                        color="inherit"
+                        onClick={toggleTheme}
+                        sx={{ ml: 2 }}
+                    >
+                        {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+                    </IconButton>
+                    <IconButton size="large" edge="end" color="inherit" sx={{ ml: 2 }}>
+                        <Search />
+                    </IconButton>
+                    <IconButton size="large" edge="end" color="inherit" sx={{ ml: 2 }}>
+                        <Notifications />
+                    </IconButton>
+                    <Tooltip title="Open settings">
+                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                            <Avatar sx={{ bgcolor: '#2a2b40' }}>
+                                {firstLetter}
+                            </Avatar>
+                        </IconButton>
+                    </Tooltip>
+                    <Menu
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                    >
+                        <MenuItem onClick={onLogout}>Logout</MenuItem>
+                    </Menu>
+                </Toolbar>
+            </AppBar>
+        </Box>
+    );
 };
 
-export default App;
+Header.propTypes = {
+    onLogout: PropTypes.func.isRequired,
+    sidebarOpen: PropTypes.bool.isRequired,
+    toggleSidebar: PropTypes.func.isRequired,
+};
+
+export default Header;
