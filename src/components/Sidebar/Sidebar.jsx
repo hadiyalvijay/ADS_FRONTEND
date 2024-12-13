@@ -15,40 +15,46 @@ import PersonIcon from '@mui/icons-material/Person';
 import GridIcon from '@mui/icons-material/GridView';
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
 import ChevronRight from '@mui/icons-material/ChevronRight';
-import { useTheme } from '../ThemeContext'; // Adjust path as necessary
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import Logo from "../../img/ads.png"
+import { useTheme } from '../ThemeContext';
+import { useNavigate } from 'react-router-dom';
+import Logo from "../../img/ads.png";
 
 const Sidebar = ({ open, onClose, toggleScroll }) => {
   const { isDarkMode } = useTheme();
   const sidebarRef = useRef(null);
   const navigate = useNavigate();
   const [isRotated, setIsRotated] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('sidebarCollapsed') === 'true' ? true : false;
+  });
 
-
-
-
-  const [isCollapsed, setIsCollapsed] = useState(localStorage.getItem('sidebarCollapsed') === 'true');
-  const [showEmployeeChildren, setShowEmployeeChildren] = useState(false); // For toggling employee subitems
+  const [showEmployeeChildren, setShowEmployeeChildren] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Collapse sidebar automatically on mobile devices
+
   useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
+    } else {
+      setIsCollapsed(localStorage.getItem('sidebarCollapsed') === 'true');
     }
   }, [isMobile]);
 
-  // Store sidebar collapse state in localStorage
+
+
   useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', isCollapsed);
-  }, [isCollapsed]);
+    if (isMobile) {
+      setIsCollapsed(true);
+    } else {
+      setIsCollapsed(localStorage.getItem('sidebarCollapsed') === 'true' ? true : false);
+    }
+  }, [isMobile]);
 
   const handleItemClick = (item) => {
     if (item === 'Employee') {
       setShowEmployeeChildren((prev) => !prev);
     } else if (item === 'Dashboard') {
-      navigate('/Dashboard'); // Navigate to Dashboard page (MainContent)
+      navigate('/Dashboard');
     }
   };
 
@@ -61,37 +67,49 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
   };
 
   const handleSidebarToggle = () => {
-    setIsRotated((prev) => !prev); // Toggle rotation state
     setIsCollapsed((prev) => {
       const newCollapsedState = !prev;
-      if (newCollapsedState) {
-        setShowEmployeeChildren(false);
-      }
+      if (newCollapsedState) setShowEmployeeChildren(false);
+      localStorage.setItem('sidebarCollapsed', newCollapsedState);
       return newCollapsedState;
     });
-    toggleScroll('left');
+    setIsRotated((prev) => !prev);
     onClose();
   };
+
+  // const handleMobileSidebarToggle = () => {
+  //   setIsCollapsed((prev) => {
+  //     const newCollapsedState = !prev;
+  //     localStorage.setItem('sidebarCollapsed', newCollapsedState);
+  //     return newCollapsedState;
+  //   });
+  // };
+
 
   return (
     <Box
       ref={sidebarRef}
       sx={{
-        width: isCollapsed ? '80px' : '260px',
+        position: isMobile ? 'fixed' : 'sticky',
+        width: isCollapsed ? '90px' : '260px',
         height: '100vh',
         bgcolor: isDarkMode ? '#2a2b40' : '#ffffff',
         color: isDarkMode ? '#fff' : '#566a7f',
         left: 0,
         top: 0,
         transition: 'width 0.3s ease',
-        zIndex: 1200,
+        zIndex: 1300,
+        '&.mobile-open': {
+          zIndex: 9999,
+          width: "200px",
+        },
         '&:hover': {
           width: isMobile ? '90px' : '260px',
           '& .MuiListItemText-root, & .adsh-title': {
-            opacity: isMobile ? 0 : 1,
+            opacity: isMobile ? 1 : 1,
           },
           '& .toggle-button': {
-            opacity: isMobile ? 0 : 1,
+            opacity: isMobile ? 1 : 1,
           },
         },
         boxShadow: isDarkMode ? '' : '1px 0 8px rgba(0, 0, 0, 0.1)',
@@ -99,47 +117,53 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
     >
       <Box role="presentation">
         <Box display={'flex'} justifyContent={'left'} alignItems={'center'} marginTop={'17px'}>
-          <img
-            src={Logo}
-            alt="Logo"
-            style={{
-              width: '100%',
-              maxWidth: '120px',
-              height: 'auto',
-              transition: 'transform 0.3s ease',
-              cursor: 'pointer',
-              display: 'block',
-              margin: '0 auto',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'scale(1.1)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-          />
 
-          <Typography
-            variant="h5"
-            className="adsh-title"
-            sx={{
-              margin: '15px',
-              mb: 2,
-              color: isDarkMode ? '#cfc8e3' : '#536880',
-              opacity: isCollapsed ? 0 : 1,
-              transition: 'opacity 0.3s ease',
-              display: isMobile ? 'none' : 'block',
-              fontWeight: "bold",
-            }}
-          >
-            ADSHR
-          </Typography>
+          {!isMobile || !isCollapsed ? (
+            <img
+              src={Logo}
+              alt="Logo"
+              style={{
+                width: '100%',
+                maxWidth: '120px',
+                height: 'auto',
+                transition: 'transform 0.3s ease',
+                cursor: 'pointer',
+                display: 'block',
+                margin: '0 auto',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            />
+          ) : null}
+
+
+          {!isMobile || !isCollapsed ? (
+            <Typography
+              variant="h5"
+              className="adsh-title"
+              sx={{
+                margin: '15px',
+                mb: 2,
+                color: isDarkMode ? '#cfc8e3' : '#536880',
+                opacity: isCollapsed ? 0 : 1,
+                transition: 'opacity 0.3s ease',
+                display: isMobile ? 'none' : 'block',
+                fontWeight: "bold",
+              }}
+            >
+              ADSHR
+            </Typography>
+          ) : null}
 
           <IconButton
             className="toggle-button"
             onClick={handleSidebarToggle}
             sx={{
-              marginLeft: 0.3,
+              marginLeft: 0.9,
               border: '7px solid',
               height: '40px',
               width: '40px',
@@ -162,16 +186,16 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color:"#fff",
+                color: "#fff",
                 transition: 'margin-left 0.3s ease',
-                transform: isRotated ? 'rotate(180deg)' : 'rotate(0deg)', 
+                transform: isRotated ? 'rotate(180deg)' : 'rotate(0deg)',
               }}
             >
               {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
             </Box>
           </IconButton>
-
         </Box>
+        {!isMobile || !isCollapsed ? (
 
         <List sx={{ cursor: 'pointer' }}>
           {['Dashboard', 'Employee'].map((item, index) => (
@@ -201,24 +225,26 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
 
               {item === 'Employee' && showEmployeeChildren && (
                 <>
-                  {/* Only show subitems if sidebar is expanded */}
                   <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Employee')}>
                     <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
                       <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
                     </ListItemIcon>
-                    <ListItemText primary="Employee" sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }} />
+                    <ListItemText primary="Employee" sx={{ opacity: isCollapsed ? 0 : 1 }} />
                   </ListItem>
+
                   <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Attendance')}>
                     <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
                       <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
                     </ListItemIcon>
-                    <ListItemText primary="Attendance" sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }} />
+                    <ListItemText primary="Attendance" sx={{ opacity: isCollapsed ? 0 : 1 }} />
                   </ListItem>
                 </>
               )}
             </React.Fragment>
           ))}
         </List>
+          ) : null}
+
       </Box>
     </Box>
   );

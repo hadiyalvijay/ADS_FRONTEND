@@ -34,45 +34,33 @@ const SignIn = ({ onSignIn }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setTimeout(async () => {
+        try {
             if (isSignIn) {
-                try {
-                    const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/login', { email, password });
-                    const { token, username } = response.data;
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('username', username);
-                    onSignIn(username);
-                    navigate('/Dashboard');
-                } catch (error) {
-                    if (error.response && error.response.data) {
-                        setErrorMessage(error.response.data.msg || 'Invalid email or password. Please try again.');
-                    } else {
-                        setErrorMessage('An error occurred. Please try again.');
-                    }
-                    setOpenSnackbar(true);
-                }
+                const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/login', { email, password });
+                const { token, username } = response.data;
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', username);
+                onSignIn(username);
+                navigate('/Dashboard');
             } else {
-                try {
-                    const newUser = { username, email, password };
-                    const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/register', newUser);
-                    const { token, username: registeredUsername } = response.data;
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('username', registeredUsername);
-                    setUsername(registeredUsername);
-                    setErrorMessage('Registration successful. You can now sign in.');
-                    setOpenSnackbar(true);
-                    setIsSignIn(true);
-                } catch (error) {
-                    if (error.response && error.response.data) {
-                        setErrorMessage('User already exists. Please try Signing in.');
-                    } else {
-                        setErrorMessage('An error occurred during registration.');
-                    }
-                    setOpenSnackbar(true);
-                }
+                const newUser = { username, email, password };
+                const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/register', newUser);
+                const { token, username: registeredUsername } = response.data;
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', registeredUsername);
+                setUsername(registeredUsername);
+                setErrorMessage('Registration successful. You can now sign in.');
+                setOpenSnackbar(true);
+                setIsSignIn(true);
             }
+        } catch (error) {
+            setErrorMessage(
+                error.response?.data?.msg || 'An error occurred. Please try again.'
+            );
+            setOpenSnackbar(true);
+        } finally {
             setLoading(false);
-        }, 1000);
+        }
     };
 
     const handleCloseSnackbar = () => {
@@ -82,11 +70,13 @@ const SignIn = ({ onSignIn }) => {
     return (
         <Box
             display="flex"
-            height="97vh"
+            height="99vh"
+            width="99vw"
             sx={{
                 flexDirection: { xs: 'column', lg: 'row' },
                 justifyContent: 'center',
                 alignItems: 'center',
+                // margin: isMobile ? "5px":""
             }}
         >
             {/* Only show the image side if not on mobile */}
@@ -102,7 +92,7 @@ const SignIn = ({ onSignIn }) => {
                     }}
                 />
             )}
-            <Box sx={{ width: { lg: '2px' }, height: '102vh', marginRight: { lg: '50px', xs: '0' }, backgroundColor: '#eaeded', boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)', display: isMobile ? 'none' : 'block' }} />
+            <Box sx={{ width: { lg: '2px' }, height: '100vh', marginRight: { lg: '50px', xs: '0' }, backgroundColor: '#eaeded', boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)', display: isMobile ? 'none' : 'block' }} />
 
             {/* Sign In Form */}
             <Box
@@ -117,7 +107,9 @@ const SignIn = ({ onSignIn }) => {
                 padding={{ xs: 3, sm: 4 }}
                 bgcolor="white"
                 borderRadius={4}
-                marginTop={{ xs: '20px', lg: '10px' }}
+                marginTop={{ xs: '22px', lg: '10px' }}
+                marginBottom={{ xs: '15px', lg: '10px' }}
+
                 sx={{
                     color: "#566a7f",
                     width: { xs: '90%', sm: '80%', md: '70%', lg: '50%' },

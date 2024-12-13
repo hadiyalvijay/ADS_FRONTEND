@@ -12,7 +12,8 @@ const Statistics = ({ statsData }) => {
                 bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                 color: isDarkMode ? '#c7c7df' : '#566a7f', 
                 borderRadius: 1,
-                height: '413px',
+                height: { xs: 'auto', md: '460px' },
+                overflow: 'auto',
             }}
         >
             <Typography variant="h6">Statistics</Typography>
@@ -20,7 +21,7 @@ const Statistics = ({ statsData }) => {
             {statsData.map((stat, index) => (
                 <Box key={index} sx={{ mt: 2 }}>
                     <Typography variant="body2">{stat.label}</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' } }}>
                         <Box sx={{ width: '100%', mr: 1 }}>
                             <LinearProgress 
                                 variant="determinate" 

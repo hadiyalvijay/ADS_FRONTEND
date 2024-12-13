@@ -43,6 +43,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const EmployeeModal = () => {
   const { isDarkMode } = useTheme();
   const [open, setOpen] = useState(false);
+  const [profilePicBase64, setProfilePicBase64] = useState(""); 
 
   const theme = createTheme({
     palette: {
@@ -72,7 +73,7 @@ const EmployeeModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
+
 
 
     // Check if password and confirm password match
@@ -141,15 +142,17 @@ const EmployeeModal = () => {
   });
   const [error, setError] = useState(false);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file.size > 5 * 1024 * 1024) { // 5 MB limit
-      alert('File size exceeds the 5MB limit');
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        profilepic: file.name,
-      }));
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the selected file
+
+    if (file) {
+      const reader = new FileReader();
+      
+      reader.onloadend = () => {
+        setProfilePicBase64(reader.result); // Set the base64 string in state
+      };
+      
+      reader.readAsDataURL(file); // Read the file as base64
     }
   };
 
@@ -587,10 +590,7 @@ const EmployeeModal = () => {
                   </Fade>
                   <Fade in={open} timeout={2800}>
                     <Grid item xs={12} sm={6}>
-                      <Box sx={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
                         <TextField
                           fullWidth
                           required
@@ -603,11 +603,11 @@ const EmployeeModal = () => {
                           }}
                           sx={{
                             '& input[type="file"]::-webkit-file-upload-button': {
-                              bgcolor: isDarkMode ? '#2a2b40' : '#fff', color: isDarkMode ? '#c7c7df' : '#566a7f',
+                              bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                              color: isDarkMode ? '#c7c7df' : '#566a7f',
                               border: 'none',
                               width: '130px',
                               margin: '-9px',
-
                               borderRadius: '5px',
                               cursor: 'pointer',
                               fontWeight: 'bold',
@@ -619,10 +619,19 @@ const EmployeeModal = () => {
                               marginRight: '20px',
                             },
                           }}
-
                         />
-
                       </Box>
+
+                      {/* Display the uploaded image (if any) */}
+                      {profilePicBase64 && (
+                        <Box sx={{ marginTop: '20px' }}>
+                          <img
+                            src={profilePicBase64}
+                            alt="Profile Pic"
+                            style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                          />
+                        </Box>
+                      )}
                     </Grid>
                   </Fade>
 

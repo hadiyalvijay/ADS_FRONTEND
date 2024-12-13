@@ -8,7 +8,7 @@ import Sidebar from '../Sidebar/Sidebar';
 const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const { isDarkMode, toggleTheme } = useTheme();
-    const isMobile = useMediaQuery('(max-width: 1000px)');  
+    const isMobile = useMediaQuery('(max-width: 1000px)');
     const username = localStorage.getItem('username') || 'Guest';
     const firstLetter = username.charAt(0).toUpperCase();
 
@@ -18,7 +18,6 @@ const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
             sidebarOpen = JSON.parse(savedSidebarState);
         }
     }, [toggleSidebar]);
-    
 
     const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
     const handleCloseUserMenu = () => setAnchorElUser(null);
@@ -27,13 +26,14 @@ const Header = ({ onLogout, sidebarOpen, toggleSidebar }) => {
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             <AppBar
                 sx={{
-                    position: "static",
+                    position: isMobile ? "fixed" : "sticky",
                     bgcolor: isDarkMode ? '#2a2b40' : '#fff',
                     color: isDarkMode ? '#fff' : '#000',
                     borderRadius: isMobile ? 0 : 1,
                     mt: isMobile ? 0 : 2,
-                    zIndex: 1100,
+                    // zIndex: 1100,
                     transition: 'width 0.3s ease, margin-left 0.3s ease',
+
                 }}
             >
                 <Toolbar sx={{ minHeight: 56, px: 2 }}>

@@ -48,14 +48,14 @@ const ActivityTimeline = ({ activityLog }) => {
   return (
     <Box
       sx={{
-        padding: 2,
+        padding: { xs: 1, sm: 2 },
         borderRadius: 2,
         boxShadow: 3,
-        height: '413px',
+        height: { xs: 'auto', sm: '460px' },
         overflowY: 'auto',
       }}
     >
-      <Typography variant="h6" sx={{ marginBottom: 2, fontWeight: 'bold' }}>
+      <Typography variant="h6" sx={{ marginBottom: 2, fontWeight: 'bold', fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
         Activity Timeline
       </Typography>
       <List>
@@ -70,11 +70,12 @@ const ActivityTimeline = ({ activityLog }) => {
                   sx={{
                     borderRadius: 1,
                     display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
                 >
-                  <div style={{ position: 'relative', marginRight: '20px' }}>
+                  <div style={{ position: 'relative', marginRight: { xs: '0', sm: '20px' } }}>
                     <div
                       style={{
                         marginTop: '4px',
@@ -100,12 +101,12 @@ const ActivityTimeline = ({ activityLog }) => {
                   </div>
 
                   {/* Activity description */}
-                  <Typography sx={{ color: isDarkMode ? '#c7c7df' : '#566a7f', flexGrow: 1, margin: '10px' }}>
+                  <Typography sx={{ color: isDarkMode ? '#c7c7df' : '#566a7f', flexGrow: 1, margin: '10px', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                     {activity.description}
                   </Typography>
 
                   {/* Activity time */}
-                  <Typography sx={{ color: isDarkMode ? '#a1a1c7' : '#8792a0', fontSize: '13px', gap: '50px' }}>
+                  <Typography sx={{ color: isDarkMode ? '#a1a1c7' : '#8792a0', fontSize: { xs: '0.8rem', sm: '13px' }, gap: '50px' }}>
                     {activity.time}
                   </Typography>
                 </ListItem>

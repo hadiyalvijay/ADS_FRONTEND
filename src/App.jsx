@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar/Sidebar';
+import MobileSidebar from './components/Sidebar/MobileSidebar';
 import MainContent from './components/MainContent/MainContent';
 import Header from './components/MainContent/Header';
 import SignIn from './components/SignIn/signin';
@@ -18,17 +19,12 @@ const App = () => {
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     const savedSidebarState = localStorage.getItem('sidebarOpen');
-    return savedSidebarState ? JSON.parse(savedSidebarState) : false; // Default to false (sidebar hidden)
+    return savedSidebarState ? JSON.parse(savedSidebarState) : false;
   });
 
-  const { isDarkMode, toggleTheme } = useTheme();
-  const isMobile = useMediaQuery('(max-width: 900px)'); // Check if the screen size is under 900px
+  const { isDarkMode } = useTheme();
+  const isMobile = useMediaQuery('(max-width: 900px)');
 
-  useEffect(() => {
-    localStorage.setItem('isDarkMode', isDarkMode);
-  }, [isDarkMode]);
-
-  // Toggle sidebar state
   const toggleSidebar = () => {
     const newState = !sidebarOpen;
     setSidebarOpen(newState);
@@ -36,7 +32,6 @@ const App = () => {
   };
 
   const handleSignIn = (username) => {
-    console.log('Signing in with username:', username);
     setIsSignedIn(true);
     setUsername(username);
     localStorage.setItem('username', username);
@@ -46,134 +41,116 @@ const App = () => {
   const handleSignOut = () => {
     setIsSignedIn(false);
     setUsername('');
-    localStorage.removeItem('username');
-    localStorage.removeItem('isSignedIn');
-    localStorage.removeItem('token');
+    localStorage.clear();
   };
 
-  // Get the current date
-  const currentDate = new Date();
-  const dayName = currentDate.toLocaleString('en-US', { weekday: 'long' });
-  const dayNumber = currentDate.getDate();
-  const monthName = currentDate.toLocaleString('en-US', { month: 'long' });
-  const year = currentDate.getFullYear();
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const LayoutWrapper = ({ children }) => (
+    <div
+      style={{
+        display: 'flex',
+        height: '100vh',
+        backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
+      }}
+    >
+      {isSignedIn &&
+        (isMobile ? (<>
+          {sidebarOpen && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, #9ca7b5)',
+                backdropFilter: 'blur(5px)',
+                zIndex: 999,
+              }}
+              onClick={() => setSidebarOpen(false)}
+            ></div>
+          )}
+          <MobileSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        </>
+        ) : (
+          <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
+        ))}
+      <div
+        style={{
+          flex: 1,
+          marginLeft: !isMobile ? '70px' : '20px',
+          marginRight: '20px',
+          transition: 'margin-left 0.3s ease',
+          overflow: 'auto',
+          filter: isMobile && sidebarOpen ? 'blur(5px)' : 'none',
+        }}
+      >
+        <div style={{ margin: "100" }}>
+          <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+        </div>
+        {children}
+      </div>
+    </div>
+  );
 
   return (
-    <div>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isSignedIn ? (
-                <Navigate to="/Dashboard" />
-              ) : (
-                <SignIn onSignIn={handleSignIn} />
-              )
-            }
-          />
-          <Route
-            path="/Dashboard"
-            element={
-              isSignedIn ? (
-                <div style={{
-                  display: 'flex',
-                  backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
-                  margin: -8,
-                  overflow: 'hidden',
-                }}>
-                  {/* Show sidebar if screen width is larger than 900px or if the sidebar is toggled */}
-                  {(!isMobile || sidebarOpen) && (
-                    <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-                  )}
-                  <div style={{
-                    margin: '25px',
-                    flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
-                    // marginRight: '25px',
-                    marginTop: '5px',
-                    marginBottom: '5px',
-                    transition: 'margin-left 0.3s ease',
-                  }}>
-                    <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-                    <Box style={{ color: isDarkMode ? '#c7c7df' : '#566a83' }}>
-                      <h1>Welcome, {username}</h1>
-                      <p>{dayName}, {dayNumber} {monthName} {year}</p>
-                    </Box>
-                    <MainContent sidebarOpen={sidebarOpen} />
-                  </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={isSignedIn ? <Navigate to="/Dashboard" /> : <SignIn onSignIn={handleSignIn} />}
+        />
+        <Route
+          path="/Dashboard"
+          element={
+            isSignedIn ? (
+              <LayoutWrapper>
+                <Box style={{ color: isDarkMode ? '#c7c7df' : '#566a83', marginTop: isMobile ? "80px" : "30px" }}>
+                  <h1>{getGreeting()}, {username}</h1>
+                  <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </Box>
+                <div style={{ marginTop: isMobile ? "" : "20px" }}>
+                  <MainContent sidebarOpen={sidebarOpen} />
                 </div>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/Employee/EmployeeList"
-            element={
-              isSignedIn ? (
-                <div style={{
-                  display: 'flex',
-                  backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
-                  margin: -8,
-                  overflow: 'hidden',
-                }}>
-                  {/* Show sidebar if screen width is larger than 900px or if the sidebar is toggled */}
-                  {(!isMobile || sidebarOpen) && (
-                    <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-                  )}
-                  <div style={{
-                    flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
-                    marginRight: '25px',
-                    marginTop: '5px',
-                    marginBottom: '5px',
-                    transition: 'margin-left 0.3s ease',
-                  }}>
-                    <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-                    <Employee />
-                  </div>
-                </div>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route
-            path="/Employee/Attendance/"
-            element={
-              isSignedIn ? (
-                <div style={{
-                  display: 'flex',
-                  backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
-                  margin: -8,
-                  overflow: 'hidden',
-                }}>
-                  {/* Show sidebar if screen width is larger than 900px or if the sidebar is toggled */}
-                  {(!isMobile || sidebarOpen) && (
-                    <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-                  )}
-                  <div style={{
-                    flex: 1,
-                    marginLeft: (!isMobile || sidebarOpen) ? '70px' : '25px',
-                    marginRight: '25px',
-                    marginTop: '5px',
-                    marginBottom: '5px',
-                    transition: 'margin-left 0.3s ease',
-                  }}>
-                    <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-                    <Attendance />
-                  </div>
-                </div>
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Router>
-    </div>
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/Employee/EmployeeList"
+          element={
+            isSignedIn ? (
+              <LayoutWrapper>
+                <Employee />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/Employee/Attendance/"
+          element={
+            isSignedIn ? (
+              <LayoutWrapper>
+                <Attendance />
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Router>
   );
 };
 

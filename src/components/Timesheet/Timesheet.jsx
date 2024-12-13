@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Grid } from '@mui/material';
 import { useTheme } from '../ThemeContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -147,7 +147,7 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
                 color: isDarkMode ? '#c7c7df' : '#566a7f',
                 borderRadius: 1,
                 p: 5,
-                height: '365px',
+                height: { xs: 'auto', sm: '460px' },
             }}
         >
             <Typography variant="h6" sx={{ mb: 2 }}>
