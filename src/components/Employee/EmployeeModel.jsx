@@ -43,7 +43,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const EmployeeModal = () => {
   const { isDarkMode } = useTheme();
   const [open, setOpen] = useState(false);
-  const [profilePicBase64, setProfilePicBase64] = useState(""); 
+  const [profilePicBase64, setProfilePicBase64] = useState("");
 
   const theme = createTheme({
     palette: {
@@ -143,18 +143,16 @@ const EmployeeModal = () => {
   const [error, setError] = useState(false);
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0]; // Get the selected file
-
-    if (file) {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
-      
-      reader.onloadend = () => {
-        setProfilePicBase64(reader.result); // Set the base64 string in state
-      };
-      
-      reader.readAsDataURL(file); // Read the file as base64
+      reader.onloadend = () => setProfilePicBase64(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      console.error("Invalid file type. Please upload an image.");
     }
   };
+
 
 
 
@@ -588,53 +586,47 @@ const EmployeeModal = () => {
                       </FormControl>
                     </Grid>
                   </Fade>
-                  <Fade in={open} timeout={2800}>
-                    <Grid item xs={12} sm={6}>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <TextField
-                          fullWidth
-                          required
-                          type="file"
-                          name="profilepic"
-                          inputProps={{ accept: "image/*" }}
-                          onChange={handleFileChange}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          sx={{
-                            '& input[type="file"]::-webkit-file-upload-button': {
-                              bgcolor: isDarkMode ? '#2a2b40' : '#fff',
-                              color: isDarkMode ? '#c7c7df' : '#566a7f',
-                              border: 'none',
-                              width: '130px',
-                              margin: '-9px',
-                              borderRadius: '5px',
-                              cursor: 'pointer',
-                              fontWeight: 'bold',
-                            },
-                            '& input[type="file"]': {
-                              color: isDarkMode ? '#c7c7df' : '#778791'
-                            },
-                            '& input[type="file"]::file-selector-button': {
-                              marginRight: '20px',
-                            },
-                          }}
-                        />
-                      </Box>
 
-                      {/* Display the uploaded image (if any) */}
-                      {profilePicBase64 && (
-                        <Box sx={{ marginTop: '20px' }}>
-                          <img
+                  <Fade in={open} timeout={1900}>
+                    <Grid item xs={12}>
+                      <Box>
+                        <Input
+                          type="file"
+                          inputProps={{ accept: 'image/*' }}
+                          onChange={handleFileChange}
+                          style={{ display: 'none' }}
+                          id="upload-profile-pic"
+                        />
+                        <label htmlFor="upload-profile-pic">
+                          <Button
+                            variant="outlined"
+                            component="span"
+                            sx={{
+                              mt: 2,
+                              textTransform: 'none',
+                              display: 'block',
+                            }}
+                          >
+                            Upload Profile Picture
+                          </Button>
+                        </label>
+                        {profilePicBase64 && (
+                          <Box
+                            component="img"
                             src={profilePicBase64}
-                            alt="Profile Pic"
-                            style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                            alt="Profile Preview"
+                            sx={{
+                              mt: 2,
+                              width: 100,
+                              height: 100,
+                              objectFit: 'cover',
+                              borderRadius: '50%',
+                            }}
                           />
-                        </Box>
-                      )}
+                        )}
+                      </Box>
                     </Grid>
                   </Fade>
-
                   <DialogActions sx={{ display: "flex", justifyContent: "end" }}>
                     <Button onClick={handleClose} color="primary">
                       Cancel

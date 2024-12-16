@@ -11,11 +11,8 @@ const Employeelist = ({ onEmployeeClick }) => {
         const fetchEmployeeData = async () => {
             try {
                 const response = await axios.get('https://ads-server-rdvc.vercel.app/api/employees');
-
-                console.log(response.data); // Log the response to verify its structure
-
-                // Safely check and set data
-                const employees = Array.isArray(response.data.employees) ? response.data.employees : [];
+                console.log(response.data); // Check the response structure
+                const employees = Array.isArray(response.data) ? response.data : [];
                 setEmployeeData(employees);
             } catch (err) {
                 console.error('Error fetching employee data:', err);
@@ -28,17 +25,15 @@ const Employeelist = ({ onEmployeeClick }) => {
         fetchEmployeeData();
     }, []);
 
-    // Handle employee click to view more details
     const handleEmployeeClick = (employee) => {
         if (onEmployeeClick) {
-            onEmployeeClick(employee); // Call the onEmployeeClick function passed from parent
+            onEmployeeClick(employee);
         }
     };
 
     return (
         <div className="container mt-4">
             <h3 className="mb-4">Employee List</h3>
-
             {loading && <div className="alert alert-info">Loading...</div>}
             {error && <div className="alert alert-danger">Error: {error}</div>}
 
@@ -55,28 +50,31 @@ const Employeelist = ({ onEmployeeClick }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(employeeData) && employeeData.length > 0 ? (
+                        {employeeData.length > 0 ? (
                             employeeData.map((employee, index) => (
                                 <tr key={index}>
                                     <td>
                                         <div className="d-flex align-items-center">
                                             {employee.profilepic ? (
                                                 <img
-                                                    src={`data:image/jpeg;base64,${employee.profilepic}`}
+                                                    src={`http://localhost:5000${employee.profilepic}`}
                                                     alt="Profile"
                                                     style={{ width: '50px', height: '50px', borderRadius: '50%' }}
                                                     className="mr-3"
                                                 />
+
                                             ) : (
                                                 <span>No Profile Pic</span>
                                             )}
-                                            <span>{employee.firstName} {employee.middleName} {employee.lastName}</span>
+                                            <span>
+                                                {employee.firstName || 'N/A'} {employee.middleName || ''} {employee.lastName || 'N/A'}
+                                            </span>
                                         </div>
                                     </td>
-                                    <td>{employee.officeEmail}</td>
-                                    <td>{employee.mobileNumber}</td>
-                                    <td>{employee.department}</td>
-                                    <td>{new Date(employee.joiningDate).toLocaleDateString()}</td>
+                                    <td>{employee.officeEmail || 'N/A'}</td>
+                                    <td>{employee.mobileNumber || 'N/A'}</td>
+                                    <td>{employee.department || 'N/A'}</td>
+                                    <td>{employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : 'N/A'}</td>
                                     <td>
                                         <button
                                             className="btn btn-info btn-sm"
@@ -95,7 +93,6 @@ const Employeelist = ({ onEmployeeClick }) => {
                             </tr>
                         )}
                     </tbody>
-
                 </table>
             </div>
         </div>
