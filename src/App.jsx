@@ -1,3 +1,4 @@
+// App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar/Sidebar';
@@ -60,24 +61,25 @@ const App = () => {
       }}
     >
       {isSignedIn &&
-        (isMobile ? (<>
-          {sidebarOpen && (
-            <div
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, #9ca7b5)',
-                backdropFilter: 'blur(5px)',
-                zIndex: 999,
-              }}
-              onClick={() => setSidebarOpen(false)}
-            ></div>
-          )}
-          <MobileSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        </>
+        (isMobile ? (
+          <>
+            {sidebarOpen && (
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  backdropFilter: 'blur(5px)',
+                  zIndex: 999,
+                }}
+                onClick={() => setSidebarOpen(false)}
+              ></div>
+            )}
+            <MobileSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          </>
         ) : (
           <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
         ))}
@@ -91,9 +93,7 @@ const App = () => {
           filter: isMobile && sidebarOpen ? 'blur(5px)' : 'none',
         }}
       >
-        <div style={{ margin: "100" }}>
-          <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-        </div>
+        <Header onLogout={handleSignOut} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
         {children}
       </div>
     </div>
@@ -111,13 +111,25 @@ const App = () => {
           element={
             isSignedIn ? (
               <LayoutWrapper>
-                <Box style={{ color: isDarkMode ? '#c7c7df' : '#566a83', marginTop: isMobile ? "80px" : "30px" }}>
-                  <h1>{getGreeting()}, {username}</h1>
-                  <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <Box
+                  style={{
+                    color: isDarkMode ? '#c7c7df' : '#566a83',
+                    marginTop: isMobile ? '80px' : '30px',
+                  }}
+                >
+                  <h1>
+                    {getGreeting()}, {username}
+                  </h1>
+                  <p>
+                    {new Date().toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
                 </Box>
-                <div style={{ marginTop: isMobile ? "" : "20px" }}>
-                  <MainContent sidebarOpen={sidebarOpen} />
-                </div>
+                <MainContent sidebarOpen={sidebarOpen} />
               </LayoutWrapper>
             ) : (
               <Navigate to="/" />
