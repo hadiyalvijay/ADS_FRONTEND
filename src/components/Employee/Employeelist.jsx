@@ -7,12 +7,15 @@ const Employeelist = ({ onEmployeeClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Fetch employee data from API
     useEffect(() => {
         const fetchEmployeeData = async () => {
             try {
-                const response = await axios.get('https://ads-server-rdvc.vercel.app/api/employees');
-                console.log(response.data); // Check the response structure
-                const employees = Array.isArray(response.data) ? response.data : [];
+                const response = await axios.get('http://localhost:5000/api/employees');
+                const employees = response.data.map(employee => ({
+                    ...employee,
+                    profilePicUrl: `http://localhost:5000${employee.profilePic}` // Ensure full image URL
+                }));
                 setEmployeeData(employees);
             } catch (err) {
                 console.error('Error fetching employee data:', err);
@@ -25,6 +28,7 @@ const Employeelist = ({ onEmployeeClick }) => {
         fetchEmployeeData();
     }, []);
 
+    // Handle employee row click
     const handleEmployeeClick = (employee) => {
         if (onEmployeeClick) {
             onEmployeeClick(employee);
@@ -34,6 +38,8 @@ const Employeelist = ({ onEmployeeClick }) => {
     return (
         <div className="container mt-4">
             <h3 className="mb-4">Employee List</h3>
+
+            {/* Loading and Error States */}
             {loading && <div className="alert alert-info">Loading...</div>}
             {error && <div className="alert alert-danger">Error: {error}</div>}
 
@@ -50,31 +56,35 @@ const Employeelist = ({ onEmployeeClick }) => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Check if employee data is available */}
                         {employeeData.length > 0 ? (
                             employeeData.map((employee, index) => (
                                 <tr key={index}>
                                     <td>
                                         <div className="d-flex align-items-center">
-                                            {employee.profilepic ? (
+                                            {employee.profilePicUrl && employee.profilePicUrl.trim() !== '' ? (
                                                 <img
-                                                    src={`http://localhost:5000${employee.profilepic}`}
-                                                    alt="Profile"
-                                                    style={{ width: '50px', height: '50px', borderRadius: '50%' }}
-                                                    className="mr-3"
+                                                    src={employee.profilePicUrl}
+                                                    alt="Profile Pic"
+                                                    style={{ width: '150px', height: '150px', borderRadius: '50%' }}
                                                 />
-
                                             ) : (
                                                 <span>No Profile Pic</span>
                                             )}
                                             <span>
-                                                {employee.firstName || 'N/A'} {employee.middleName || ''} {employee.lastName || 'N/A'}
+                                                {employee.firstName || 'N/A'} {employee.middleName || ''}{' '}
+                                                {employee.lastName || 'N/A'}
                                             </span>
                                         </div>
                                     </td>
                                     <td>{employee.officeEmail || 'N/A'}</td>
                                     <td>{employee.mobileNumber || 'N/A'}</td>
                                     <td>{employee.department || 'N/A'}</td>
-                                    <td>{employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : 'N/A'}</td>
+                                    <td>
+                                        {employee.joiningDate
+                                            ? new Date(employee.joiningDate).toLocaleDateString()
+                                            : 'N/A'}
+                                    </td>
                                     <td>
                                         <button
                                             className="btn btn-info btn-sm"

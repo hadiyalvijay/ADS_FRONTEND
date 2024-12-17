@@ -36,7 +36,7 @@ const SignIn = ({ onSignIn }) => {
         setLoading(true);
         try {
             if (isSignIn) {
-                const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/login', { email, password });
+                const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
                 const { token, username } = response.data;
                 localStorage.setItem('token', token);
                 localStorage.setItem('username', username);
@@ -44,7 +44,7 @@ const SignIn = ({ onSignIn }) => {
                 navigate('/Dashboard');
             } else {
                 const newUser = { username, email, password };
-                const response = await axios.post('https://ads-server-rdvc.vercel.app/api/auth/register', newUser);
+                const response = await axios.post('http://localhost:5000/api/auth/register', newUser);
                 const { token, username: registeredUsername } = response.data;
                 localStorage.setItem('token', token);
                 localStorage.setItem('username', registeredUsername);
