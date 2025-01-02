@@ -9,9 +9,10 @@ const Statistics = ({ statsData }) => {
         <Box
             sx={{
                 p: 2,
-                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                bgcolor: isDarkMode ? '#2a2b40' : '#fefeff',
                 color: isDarkMode ? '#c7c7df' : '#566a7f', 
-                borderRadius: 1,
+                borderRadius: 3,
+               
                 height: { xs: 'auto', md: '460px' },
                 overflow: 'auto',
             }}

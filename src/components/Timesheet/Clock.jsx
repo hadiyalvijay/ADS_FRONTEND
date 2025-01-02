@@ -4,7 +4,7 @@ import { Box, Typography, Button } from '@mui/material';
 const Clock = ({ time, isDarkMode }) => {
     const [activeState, setActiveState] = useState("in");
 
-    // Define label mappings based on the active state (in/out)
+   
     const labels = activeState === "in" 
         ? { hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds' } 
         : { hours: 'Work', minutes: 'Lunch', seconds: 'Break' };
@@ -29,7 +29,6 @@ const Clock = ({ time, isDarkMode }) => {
 
     return (
         <Box>
-            {/* Display Progress Rings for Hours, Minutes, and Seconds */}
             <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', mt: 3 }}>
                 <ProgressRing 
                     value={getTimeValue('hours')} 
@@ -53,7 +52,7 @@ const Clock = ({ time, isDarkMode }) => {
 };
 
 const ProgressRing = ({ value, label, strokeColor, max = 60 }) => {
-    // Function to calculate progress for the progress ring
+    
     const setProgress = (progress) => (progress / max) * (2 * Math.PI * 36);
 
     return (

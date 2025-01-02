@@ -1,22 +1,34 @@
-// App.jsx
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar/Sidebar';
 import MobileSidebar from './components/Sidebar/MobileSidebar';
 import MainContent from './components/MainContent/MainContent';
 import Header from './components/MainContent/Header';
 import SignIn from './components/SignIn/signin';
-import { useTheme } from './components/ThemeContext';
-import { Box, useMediaQuery } from '@mui/material';
 import Employee from './components/Employee/Employee';
 import Attendance from './components/Attendance/Attendance';
+import UserProfile from './components/Employee/UserProfile';
+import { useTheme } from './components/ThemeContext';
+import { Box, useMediaQuery } from '@mui/material';
+import { Loader2 } from 'lucide-react';
+import EnhancedLoading from './components/EnhancedLoading';
+import axios from 'axios';
+
+const LoadingOverlay = () => (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <EnhancedLoading className="text-white" overlay />
+  </div>
+);
 
 const App = () => {
+  const location = useLocation();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(() => {
     const storedSignInStatus = localStorage.getItem('isSignedIn');
     return storedSignInStatus === 'true';
   });
-
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     const savedSidebarState = localStorage.getItem('sidebarOpen');
@@ -26,24 +38,71 @@ const App = () => {
   const { isDarkMode } = useTheme();
   const isMobile = useMediaQuery('(max-width: 900px)');
 
+ 
+  useEffect(() => {
+    const initializeApp = async () => {
+      setIsLoading(true);
+      try {
+       
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initializeApp();
+  }, []);
+
   const toggleSidebar = () => {
     const newState = !sidebarOpen;
     setSidebarOpen(newState);
     localStorage.setItem('sidebarOpen', JSON.stringify(newState));
   };
 
-  const handleSignIn = (username) => {
-    setIsSignedIn(true);
-    setUsername(username);
-    localStorage.setItem('username', username);
-    localStorage.setItem('isSignedIn', 'true');
+  const handleSignIn = async (username) => {
+    setPageLoading(true);
+    try {
+     
+      const response = await axios.get('http://localhost:5000/api/employees');
+      const employee = response.data.find(emp => emp.username === username);
+
+      if (employee) {
+        const fullName = `${employee.firstName} ${employee.middleName || ''}`.trim();
+        console.log(fullName);
+        setUsername(fullName);  
+        localStorage.setItem('username', fullName);
+
+      } else {
+        setUsername(username);
+        localStorage.setItem('username', username);
+      }
+
+      setIsSignedIn(true);
+      localStorage.setItem('isSignedIn', 'true');
+      await new Promise(resolve => setTimeout(resolve, 1000)); 
+    } catch (error) {
+      console.error('Error during sign in:', error);
+    } finally {
+      setPageLoading(false);
+    }
   };
 
   const handleSignOut = () => {
+    setPageLoading(true);
     setIsSignedIn(false);
     setUsername('');
+
+
+    const isDarkMode = localStorage.getItem('isDarkMode');
+
     localStorage.clear();
+    if (isDarkMode) {
+      localStorage.setItem('isDarkMode', isDarkMode);
+    }
+
+    setPageLoading(false);
   };
+
+
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -52,16 +111,32 @@ const App = () => {
     return 'Good Evening';
   };
 
+  if (isLoading || pageLoading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-[#232333]' : 'bg-[#ffffff]'}`}>
+        <EnhancedLoading fullScreen />
+      </div>
+    );
+  }
+
+
   const LayoutWrapper = ({ children }) => (
     <div
+      className={`
+        flex h-auto w-auto 
+        ${isDarkMode ? 'bg-[#232333]' : 'bg-slate-50'}
+        ${pageLoading ? 'pointer-events-none' : ''}
+      `}
       style={{
         display: 'flex',
-        height: '100vh',
+        height: 'auto',
+        width: 'auto',
         backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
       }}
     >
-      {isSignedIn &&
-        (isMobile ? (
+      {pageLoading && <LoadingOverlay />}
+      {isSignedIn && (
+        isMobile ? (
           <>
             {sidebarOpen && (
               <div
@@ -76,20 +151,20 @@ const App = () => {
                   zIndex: 999,
                 }}
                 onClick={() => setSidebarOpen(false)}
-              ></div>
+              />
             )}
             <MobileSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
           </>
         ) : (
           <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-        ))}
+        )
+      )}
       <div
         style={{
           flex: 1,
-          marginLeft: !isMobile ? '70px' : '20px',
-          marginRight: '20px',
+          marginLeft: !isMobile ? '120px' : '20px',
+          marginRight: '120px',
           transition: 'margin-left 0.3s ease',
-          overflow: 'auto',
           filter: isMobile && sidebarOpen ? 'blur(5px)' : 'none',
         }}
       >
@@ -100,14 +175,24 @@ const App = () => {
   );
 
   return (
-    <Router
-      future={{
-        v7_relativeSplatPath: true, 
-      }}>
-      <Routes>
+      <Routes location={location} key={location.key}>
+        <Route
+          path="/loading"
+          element={
+            <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-[#232333]' : 'bg-slate-50'}`}>
+              <EnhancedLoading size="large" />
+            </div>
+          }
+        />
         <Route
           path="/"
-          element={isSignedIn ? <Navigate to="/Dashboard" /> : <SignIn onSignIn={handleSignIn} />}
+          element={
+            isSignedIn ? (
+              <Navigate to="/Dashboard" />
+            ) : (
+              <SignIn onSignIn={handleSignIn} />
+            )
+          }
         />
         <Route
           path="/Dashboard"
@@ -117,13 +202,14 @@ const App = () => {
                 <Box
                   style={{
                     color: isDarkMode ? '#c7c7df' : '#566a83',
-                    marginTop: isMobile ? '80px' : '30px',
+                    marginTop: isMobile ? '85px' : '30px',
+                    fontSize: '24px',
                   }}
                 >
-                  <h1>
+                  <h1 style={{ fontSize: '40px' }}>
                     {getGreeting()}, {username}
                   </h1>
-                  <p>
+                  <p style={{ fontSize: '20px' }}>
                     {new Date().toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',
@@ -132,7 +218,10 @@ const App = () => {
                     })}
                   </p>
                 </Box>
-                <MainContent sidebarOpen={sidebarOpen} />
+                <MainContent
+                  sidebarOpen={sidebarOpen}
+                  setPageLoading={setPageLoading}
+                />
               </LayoutWrapper>
             ) : (
               <Navigate to="/" />
@@ -144,7 +233,9 @@ const App = () => {
           element={
             isSignedIn ? (
               <LayoutWrapper>
-                <Employee />
+                <Box style={{ fontSize: isMobile ? '18px' : '25px', marginTop: isMobile ? '100px' : '10px' }}>
+                  <Employee setPageLoading={setPageLoading} />
+                </Box>
               </LayoutWrapper>
             ) : (
               <Navigate to="/" />
@@ -152,11 +243,41 @@ const App = () => {
           }
         />
         <Route
-          path="/Employee/Attendance/"
+          path="/Employee/Attendance"
           element={
             isSignedIn ? (
               <LayoutWrapper>
-                <Attendance />
+                <Box style={{ fontSize: isMobile ? '18px' : '25px', marginTop: isMobile ? '100px' : '10px' }}>
+                  <Attendance setPageLoading={setPageLoading} />
+                </Box>
+              </LayoutWrapper>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/User Profile/Profile"
+          element={
+            isSignedIn ? (
+              <LayoutWrapper>
+                <Box
+                  style={{
+                    fontSize: isMobile ? '18px' : '30px',
+                    marginTop: isMobile ? '100px' : '10px',
+                  }}
+                >
+                  <Box style={{ color: isDarkMode ? '#c7c7df' : '#566a7f' }}>
+                    <p>
+                      {window.location.pathname
+                        .split('/')
+                        .filter(segment => segment)
+                        .map(segment => decodeURIComponent(segment))
+                        .join(' / ')}
+                    </p>
+                  </Box>
+                  <UserProfile setPageLoading={setPageLoading} key={location.key} />
+                </Box>
               </LayoutWrapper>
             ) : (
               <Navigate to="/" />
@@ -165,7 +286,7 @@ const App = () => {
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </Router>
+   
   );
 };
 

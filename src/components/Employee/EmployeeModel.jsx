@@ -18,7 +18,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Box
+  Box,
+  useMediaQuery
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CloseIcon from '@mui/icons-material/Close';
@@ -29,10 +30,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Grow ref={ref} {...props} timeout={700} />;
 });
 
-const EmployeeModal = () => {
+const EmployeeModal = ({ isOpen, onClose, employeeData }) => {
   const { isDarkMode } = useTheme();
   const [open, setOpen] = useState(false);
   const [profilePicBase64, setProfilePicBase64] = useState("");
+  const isMobile = useMediaQuery('(max-width: 900px)');
   const [formData, setFormData] = useState({
     firstName: '',
     middleName: '',
@@ -46,7 +48,7 @@ const EmployeeModal = () => {
     confirmPassword: '',
     technology: '',
     skypeId: '',
-    employementType: '',
+    employmentType: '',
     birthDate: '',
     joiningDate: '',
     aadharCard: '',
@@ -62,7 +64,7 @@ const EmployeeModal = () => {
       mode: isDarkMode ? 'dark' : 'light',
       background: {
         default: isDarkMode ? '#121212' : '#fff',
-        paper: isDarkMode ? '#2a2b40' : '#fff',
+        paper: isDarkMode ? '#232333' : '#fff',
       }
     }
   });
@@ -91,33 +93,19 @@ const EmployeeModal = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/employees', formDataToSubmit, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const isEditing = !!employeeData;
+      const url = isEditing
+        ? `http://localhost:5000/api/employees/${employeeData._id}`
+        : 'http://localhost:5000/api/employees';
 
-      localStorage.setItem('token', response.data.token);
-      setFormData({
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        department: '',
-        designation: '',
-        mobileNumber: '',
-        officeEmail: '',
-        personalEmail: '',
-        password: '',
-        confirmPassword: '',
-        technology: '',
-        skypeId: '',
-        employementType: '',
-        birthDate: '',
-        joiningDate: '',
-        aadharCard: '',
-        panCard: '',
-        gender: '',
-        role: '',
-        profilepic: '',
+      const method = isEditing ? 'put' : 'post';
+
+      const response = await axios[method](url, formDataToSubmit, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+      localStorage.setItem('token', response.data.token);
 
       setProfilePicBase64('');
       handleClose();
@@ -125,6 +113,45 @@ const EmployeeModal = () => {
       console.error('Error submitting form:', error);
     }
   };
+  React.useEffect(() => {
+    if (employeeData && !open) {
+      setFormData({
+        ...formData,
+        firstName: employeeData.firstName || '',
+        middleName: employeeData.middleName || '',
+        lastName: employeeData.lastName || '',
+        department: employeeData.department || '',
+        designation: employeeData.designation || '',
+        mobileNumber: employeeData.mobileNumber || '',
+        officeEmail: employeeData.officeEmail || '',
+        personalEmail: employeeData.personalEmail || '',
+        password: '',
+        confirmPassword: '',
+        technology: employeeData.technology || '',
+        skypeId: employeeData.skypeId || '',
+        employmentType: employeeData.employmentType || '',
+        birthDate: employeeData.birthDate ? employeeData.birthDate.split('T')[0] : '',
+        joiningDate: employeeData.joiningDate ? employeeData.joiningDate.split('T')[0] : '',
+        aadharCard: employeeData.aadharCard || '',
+        panCard: employeeData.panCard || '',
+        gender: employeeData.gender || '',
+        role: employeeData.role || '',
+        profilepic: '',
+      });
+
+     
+      if (employeeData.profilePic) {
+        
+        setProfilePicBase64(employeeData.profilePic);
+      } else {
+        
+        setProfilePicBase64('/path-to-default-profile-pic.jpg');
+      }
+
+      setOpen(true);
+    }
+  }, [employeeData]);
+
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -155,25 +182,37 @@ const EmployeeModal = () => {
   };
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  
+  React.useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
+
+  const handleClose = () => {
+    setOpen(false);
+    if (onClose) onClose();
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  const dialogTitle = employeeData ? 'Edit Employee' : 'Add New Employee';
+  const button = employeeData ? 'Update' : 'Save';
+
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Button
-        variant="contained"
-        startIcon={<AddCircleIcon />}
-        onClick={handleOpen}
-        color={isDarkMode ? 'secondary' : 'primary'}
-      >
-        Add New Employee
-      </Button>
-
+      {!employeeData && !open && (
+        <Button
+          variant="contained"
+          startIcon={<AddCircleIcon />}
+          onClick={() => setOpen(true)}
+          style={{ height: isMobile ? "45px" : "45px", width: isMobile ? "90px" : "170px", backgroundColor: "#696cff", color: 'white' }}
+        >
+          {isMobile ? 'Add' : 'Add Employee'}
+        </Button>
+      )}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -185,10 +224,10 @@ const EmployeeModal = () => {
         BackdropProps={{ timeout: 500 }}
       >
         <DialogTitle>
-          Add New Employee
+          {dialogTitle}
           <IconButton
             onClick={handleClose}
-            sx={{ position: 'absolute', right: 8, top: 8 }}
+            sx={{ position: 'absolute', right: 8 }}
           >
             <CloseIcon />
           </IconButton>
@@ -267,9 +306,9 @@ const EmployeeModal = () => {
                       label="Designation"
                     >
                       <MenuItem value="">--All--</MenuItem>
-                      <MenuItem value="developer">Developer</MenuItem>
-                      <MenuItem value="designer">Designer</MenuItem>
-                      <MenuItem value="manager">Manager</MenuItem>
+                      <MenuItem value="Trainee">Trainee</MenuItem>
+                      <MenuItem value=".netdeveloper">.Net Developer</MenuItem>
+                      <MenuItem value="reactdeveloper">React Developer</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -380,19 +419,19 @@ const EmployeeModal = () => {
                 </Grid>
               </Fade>
 
-              <Fade in={open} timeout={2100}>
+              <Fade in={open} timeout={1900}>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth required>
                     <InputLabel>Employment Type</InputLabel>
                     <Select
-                      name="employementType"
-                      value={formData.employementType}
+                      name="employmentType"
+                      value={formData.employmentType}
                       onChange={handleChange}
                       label="Employment Type"
                     >
-                      <MenuItem value="">Please select EmployeementType</MenuItem>
-                      <MenuItem value="full-time">Full Time</MenuItem>
-                      <MenuItem value="part-time">Part Time</MenuItem>
+                      <MenuItem value="">Please select Type</MenuItem>
+                      <MenuItem value="fulltime">Full-Time</MenuItem>
+                      <MenuItem value="parttime">Part-Time</MenuItem>
                       <MenuItem value="contract">Contract</MenuItem>
                     </Select>
                   </FormControl>
@@ -503,8 +542,8 @@ const EmployeeModal = () => {
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <TextField
                       fullWidth
-                      required
                       type="file"
+                      label="Profile Picture"
                       name="profilepic"
                       inputProps={{ accept: "image/jpeg,image/png,image/gif" }}
                       onChange={handleImageUpload}
@@ -533,7 +572,7 @@ const EmployeeModal = () => {
                       }}
                     />
                   </Box>
-                  {/* Display the uploaded image (if any) */}
+                
                   {profilePicBase64 && (
                     <Box sx={{ marginTop: '20px' }}>
                       <img
@@ -563,7 +602,7 @@ const EmployeeModal = () => {
                     }
                   }}
                 >
-                  Save
+                  {button}
                 </Button>
               </DialogActions>
             </Grid>

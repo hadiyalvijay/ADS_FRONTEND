@@ -125,10 +125,10 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
         const actualWorkTime = workTime;
         setTotalWorkTime(actualWorkTime);
         setIsPunchedOut(true);
-        localStorage.setItem('workTime', actualWorkTime); // Save work time
-        localStorage.setItem('lunchTime', lunchTime); // Save lunch time
-        localStorage.setItem('breakTime', breakTime); // Save break time
-        localStorage.setItem('totalWorkTime', totalSecondsWorked); // Save total work time
+        localStorage.setItem('workTime', actualWorkTime); 
+        localStorage.setItem('lunchTime', lunchTime); 
+        localStorage.setItem('breakTime', breakTime); 
+        localStorage.setItem('totalWorkTime', totalSecondsWorked);
         localStorage.removeItem('startTime');
         logActivity('Punch Out');
     };
@@ -143,9 +143,10 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
     return (
         <Box
             sx={{
-                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                bgcolor: isDarkMode ? '#2a2b40' : '#fefeff',
                 color: isDarkMode ? '#c7c7df' : '#566a7f',
-                borderRadius: 1,
+                borderRadius: 3,
+               
                 p: 5,
                 height: { xs: 'auto', sm: '460px' },
             }}

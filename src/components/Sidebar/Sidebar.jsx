@@ -28,7 +28,9 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
     return localStorage.getItem('sidebarCollapsed') === 'true' ? true : false;
   });
 
-  const [showEmployeeChildren, setShowEmployeeChildren] = useState(false);
+  const [showEmployeeChildren, setShowEmployeeChildren] = useState(() => {
+    return localStorage.getItem('showEmployeeChildren') === 'true' ? true : false;
+  });
   const isMobile = useMediaQuery('(max-width: 768px)');
 
 
@@ -52,24 +54,38 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
 
   const handleItemClick = (item) => {
     if (item === 'Employee') {
-      setShowEmployeeChildren((prev) => !prev);
+      setShowEmployeeChildren((prev) => {
+        const newState = !prev;
+        localStorage.setItem('showEmployeeChildren', newState);
+        return newState;
+      });
     } else if (item === 'Dashboard') {
-      navigate('/Dashboard');
+      navigate('/loading');
+      setTimeout(() => {
+        navigate('/Dashboard');
+      }, 1000);
     }
   };
 
   const handleSubItemClick = (item) => {
-    if (item === 'Employee') {
-      navigate('/Employee/EmployeeList');
-    } else if (item === 'Attendance') {
-      navigate('/Employee/Attendance');
-    }
+    navigate('/loading');
+    setTimeout(() => {
+      if (item === 'Employee') {
+        navigate('/Employee/EmployeeList');
+      } else if (item === 'Attendance') {
+        navigate('/Employee/Attendance');
+      }
+    }, 1000);
   };
 
   const handleSidebarToggle = () => {
     setIsCollapsed((prev) => {
       const newCollapsedState = !prev;
-      if (newCollapsedState) setShowEmployeeChildren(false);
+      if (newCollapsedState) {
+        
+        localStorage.setItem('showEmployeeChildren', false);
+        setShowEmployeeChildren(false);
+      }
       localStorage.setItem('sidebarCollapsed', newCollapsedState);
       return newCollapsedState;
     });
@@ -77,23 +93,18 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
     onClose();
   };
 
-  // const handleMobileSidebarToggle = () => {
-  //   setIsCollapsed((prev) => {
-  //     const newCollapsedState = !prev;
-  //     localStorage.setItem('sidebarCollapsed', newCollapsedState);
-  //     return newCollapsedState;
-  //   });
-  // };
+
 
 
   return (
     <Box
       ref={sidebarRef}
+      className="bg-white rounded-lg shadow-sm"
       sx={{
         position: isMobile ? 'fixed' : 'sticky',
         width: isCollapsed ? '90px' : '260px',
         height: '100vh',
-        bgcolor: isDarkMode ? '#2a2b40' : '#ffffff',
+        bgcolor: isDarkMode ? '#2a2b40' : '#fefeff',
         color: isDarkMode ? '#fff' : '#566a7f',
         left: 0,
         top: 0,
@@ -112,7 +123,6 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
             opacity: isMobile ? 1 : 1,
           },
         },
-        boxShadow: isDarkMode ? '' : '1px 0 8px rgba(0, 0, 0, 0.1)',
       }}
     >
       <Box role="presentation">
@@ -195,55 +205,56 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
             </Box>
           </IconButton>
         </Box>
+
         {!isMobile || !isCollapsed ? (
 
-        <List sx={{ cursor: 'pointer' }}>
-          {['Dashboard', 'Employee'].map((item, index) => (
-            <React.Fragment key={index}>
-              <ListItem
-                button
-                sx={{
-                  '&:hover': {
-                    bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
-                  },
-                }}
-                onClick={() => handleItemClick(item)}
-              >
-                <ListItemIcon sx={{ marginLeft: '10px', color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
-                  {item === 'Dashboard' && <GridIcon />}
-                  {item === 'Employee' && <PersonIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item}
+          <List sx={{ cursor: 'pointer' }}>
+            {['Dashboard', 'Employee'].map((item, index) => (
+              <React.Fragment key={index}>
+                <ListItem
+                  button
                   sx={{
-                    opacity: isCollapsed ? 0 : 1,
-                    transition: 'opacity 0.3s ease',
-                    color: isDarkMode ? '#c4bdd9' : '#67798f',
+                    '&:hover': {
+                      bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
+                    },
                   }}
-                />
-              </ListItem>
+                  onClick={() => handleItemClick(item)}
+                >
+                  <ListItemIcon sx={{ marginLeft: '10px', color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
+                    {item === 'Dashboard' && <GridIcon />}
+                    {item === 'Employee' && <PersonIcon />}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item}
+                    sx={{
+                      opacity: isCollapsed ? 0 : 1,
+                      transition: 'opacity 0.3s ease',
+                      color: isDarkMode ? '#c4bdd9' : '#67798f',
+                    }}
+                  />
+                </ListItem>
 
-              {item === 'Employee' && showEmployeeChildren && (
-                <>
-                  <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Employee')}>
-                    <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
-                      <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
-                    </ListItemIcon>
-                    <ListItemText primary="Employee" sx={{ opacity: isCollapsed ? 0 : 1 }} />
-                  </ListItem>
+                {item === 'Employee' && showEmployeeChildren && !isCollapsed && (
+                  <>
+                    <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Employee')}>
+                      <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
+                        <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Employee" sx={{ opacity: isCollapsed ? 0 : 1 }} />
+                    </ListItem>
 
-                  <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Attendance')}>
-                    <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
-                      <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
-                    </ListItemIcon>
-                    <ListItemText primary="Attendance" sx={{ opacity: isCollapsed ? 0 : 1 }} />
-                  </ListItem>
-                </>
-              )}
-            </React.Fragment>
-          ))}
-        </List>
-          ) : null}
+                    <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Attendance')}>
+                      <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
+                        <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Attendance" sx={{ opacity: isCollapsed ? 0 : 1 }} />
+                    </ListItem>
+                  </>
+                )}
+              </React.Fragment>
+            ))}
+          </List>
+        ) : null}
 
       </Box>
     </Box>

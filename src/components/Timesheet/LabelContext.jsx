@@ -1,4 +1,4 @@
-// LabelContext.js
+
 import React, { createContext, useState } from 'react';
 
 const LabelContext = createContext();

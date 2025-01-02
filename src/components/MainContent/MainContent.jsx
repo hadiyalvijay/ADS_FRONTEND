@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Paper } from '@mui/material';
+import { Box, Grid, Paper } from '@mui/material';
 import ActivityTimeline from '../ActivityTimeline/ActivityTimeline';
 import Timesheet from '../Timesheet/Timesheet';
 import Statistics from '../Statistics/Statistics';
@@ -30,19 +30,20 @@ const MainContent = ({ sidebarOpen }) => {
         container
         spacing={2}
         justifyContent="space-between"
+        
         alignItems="stretch"
         sx={{
-          // marginLeft: sidebarOpen ? '200px' : '90px',
+         
           transition: 'all 0.3s ease-in-out',
           color: isDarkMode ? '#c7c7df' : '#566a7f',
         }}
         
       >
         <Grid item xs={12} sm={6} md={4}>
-          <Paper
+          <Box
             elevation={3}
             sx={{
-              bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+             
               color: isDarkMode ? '#c7c7df' : '#566a7f',
             }}
           >
@@ -55,15 +56,15 @@ const MainContent = ({ sidebarOpen }) => {
               setBreakTime={setBreakTime}
               setTotalWorkTime={setTotalWorkTime}
             />
-          </Paper>
+          </Box>
         </Grid>
 
         {/* Statistics Component */}
         <Grid item xs={12} sm={6} md={4}>
-          <Paper
+          <Box
             elevation={3}
             sx={{
-              bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+             
               color: isDarkMode ? '#c7c7df' : '#566a7f',
             }}
           >
@@ -75,20 +76,19 @@ const MainContent = ({ sidebarOpen }) => {
                 { label: 'Total Work Time', value: `${Math.floor(totalWorkTime / 3600)}h ${Math.floor((totalWorkTime % 3600) / 60)}m`, progress: (totalWorkTime / 28800) * 100, color: 'primary' },
               ]}
             />
-          </Paper>
+          </Box>
         </Grid>
 
-        {/* ActivityTimeline Component */}
         <Grid item xs={12} sm={6} md={4}>
-          <Paper
+          <Box
             elevation={3}
             sx={{
-              bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+              
               color: isDarkMode ? '#c7c7df' : '#566a7f',
             }}
           >
             <ActivityTimeline activityLog={activityLog} />
-          </Paper>
+          </Box>
         </Grid>
       </Grid>
     </>

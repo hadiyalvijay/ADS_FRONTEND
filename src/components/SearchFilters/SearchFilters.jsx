@@ -9,8 +9,8 @@ const SearchFilters = () => {
         <Box
             sx={{
                 p: 2,
-                bgcolor: isDarkMode ? '#2a2b40' : '#fff', // Background color based on theme
-                color: isDarkMode ? '#fff' : '#000', // Text color based on theme
+                bgcolor: isDarkMode ? '#2a2b40' : '#fff',
+                color: isDarkMode ? '#fff' : '#000',
                 borderRadius: 2,
             }}
         >
@@ -28,11 +28,11 @@ const SearchFilters = () => {
                                 height: '50px', 
                                 textAlign: 'center',
                                 '& .MuiInputBase-input': {
-                                    textAlign: 'center', // Center-align input text
+                                    textAlign: 'center', 
                                 },
                                 '&::placeholder': {
-                                    textAlign: 'center', // Center-align placeholder text
-                                    color: '#888', // Optional: change placeholder color
+                                    textAlign: 'center',
+                                    color: '#888', 
                                 },
                                 '&:focus': {
                                     color: '#fff',
@@ -61,11 +61,11 @@ const SearchFilters = () => {
                                 height: '50px',
                                 textAlign: 'center',
                                 '& .MuiInputBase-input': {
-                                    textAlign: 'center', // Center-align input text
+                                    textAlign: 'center',
                                 },
                                 '&::placeholder': {
-                                    textAlign: 'center', // Center-align placeholder text
-                                    color: '#888', // Optional: change placeholder color
+                                    textAlign: 'center', 
+                                    color: '#888', 
                                 },
                                 '&:focus': {
                                     color: '#fff',
@@ -94,11 +94,11 @@ const SearchFilters = () => {
                                 height: '50px',
                                 textAlign: 'center',
                                 '& .MuiInputBase-input': {
-                                    textAlign: 'center', // Center-align input text
+                                    textAlign: 'center', 
                                 },
                                 '&::placeholder': {
-                                    textAlign: 'center', // Center-align placeholder text
-                                    color: '#888', // Optional: change placeholder color
+                                    textAlign: 'center',
+                                    color: '#888', 
                                 },
                                 '&:focus': {
                                     color: '#fff',
@@ -119,7 +119,7 @@ const SearchFilters = () => {
                         fullWidth
                         variant="contained"
                         sx={{
-                            height: '40px', // Maintain height
+                            height: '40px', 
                             bgcolor: isDarkMode ? '#00f53d' : '#000',
                             color: '#fff',
                             '&:hover': {

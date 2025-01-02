@@ -5,8 +5,12 @@ import axios from 'axios';
 import 'typeface-cormorant-garamond';
 import 'typeface-saira-stencil-one';
 import Logo from "../../img/ads.png";
+import { useTheme } from '../ThemeContext';
+
 
 const SignIn = ({ onSignIn }) => {
+    const { isDarkMode } = useTheme();
+
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -70,31 +74,34 @@ const SignIn = ({ onSignIn }) => {
     return (
         <Box
             display="flex"
-            height="99vh"
-            width="99vw"
+            height="99.9vh"
+            width="99.6vw"
+            mr={0}
+            m={0}
             sx={{
                 flexDirection: { xs: 'column', lg: 'row' },
                 justifyContent: 'center',
                 alignItems: 'center',
-                // margin: isMobile ? "5px":""
+                bgcolor: isDarkMode ? '#2b2c40' : '#f6f5fa'
             }}
         >
-            {/* Only show the image side if not on mobile */}
+            
             {!isMobile && (
                 <Box
+                    className="darkig"
                     sx={{
                         display: { xs: 'none', lg: 'block' },
                         flex: 1,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        backgroundImage: "url('https://virtualdev.co/wp-content/uploads/virtual-developer-illustration-full-scale.webp')",
+                        backgroundImage: isDarkMode ? "" : "url('https://virtualdev.co/wp-content/uploads/virtual-developer-illustration-full-scale.webp')",
                         height: '100vh',
                     }}
                 />
             )}
-            <Box sx={{ width: { lg: '2px' }, height: '100vh', marginRight: { lg: '50px', xs: '0' }, backgroundColor: '#eaeded', boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)', display: isMobile ? 'none' : 'block' }} />
+            <Box sx={{ width: { lg: '2px' }, height: '100vh', marginRight: { lg: '50px', xs: '0' }, bgcolor: isDarkMode ? '#232333' : '#f6f5fa', boxShadow: '2px 0px 5px rgba(0, 0, 0, 0.3)', display: isMobile ? 'none' : 'block' }} />
 
-            {/* Sign In Form */}
+
             <Box
                 id="signin-form"
                 component={Paper}
@@ -105,13 +112,12 @@ const SignIn = ({ onSignIn }) => {
                 alignItems="center"
                 flex={isMobile ? 1 : 0.5}
                 padding={{ xs: 3, sm: 4 }}
-                bgcolor="white"
                 borderRadius={4}
                 marginTop={{ xs: '22px', lg: '10px' }}
                 marginBottom={{ xs: '15px', lg: '10px' }}
-
                 sx={{
-                    color: "#566a7f",
+                    bgcolor: isDarkMode ? '#232438' : '#fefeff',
+                    color: isDarkMode ? '#c7c7df' : '#566a7f',
                     width: { xs: '90%', sm: '80%', md: '70%', lg: '50%' },
                     cursor: 'pointer',
                     animation: 'pulse 1s ease-in-out infinite, zoom-in 0.5s ease-out',
@@ -167,7 +173,7 @@ const SignIn = ({ onSignIn }) => {
                             width: "100%",
                         }}
                     >
-                        {isSignIn ? 'Please sign-in to your account' : 'Please create account your account'}
+                        {isSignIn ? 'Please sign-in to your account' : 'Please create your account'}
                     </Typography>
                     <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {!isSignIn && (
@@ -180,8 +186,8 @@ const SignIn = ({ onSignIn }) => {
                                 onChange={(e) => setUsername(e.target.value)}
                                 sx={{
                                     '& .MuiInputBase-input': {
-                                        color: '#778791',
-                                    }
+                                        color: isDarkMode ? '#c7c7df' : '#566a7f',
+                                    },
                                 }}
                             />
                         )}
@@ -195,8 +201,8 @@ const SignIn = ({ onSignIn }) => {
                             fullWidth
                             sx={{
                                 '& .MuiInputBase-input': {
-                                    color: '#778791',
-                                }
+                                    color: isDarkMode ? '#c7c7df' : '#566a7f',
+                                },
                             }}
                         />
                         <TextField
@@ -210,8 +216,8 @@ const SignIn = ({ onSignIn }) => {
                             fullWidth
                             sx={{
                                 '& .MuiInputBase-input': {
-                                    color: '#778791',
-                                }
+                                    color: isDarkMode ? '#c7c7df' : '#566a7f',
+                                },
                             }}
                         />
                         <Button
@@ -260,6 +266,7 @@ const SignIn = ({ onSignIn }) => {
                     </Typography>
                 </Box>
             </Box>
+
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={3000}

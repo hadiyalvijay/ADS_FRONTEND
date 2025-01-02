@@ -1,23 +1,21 @@
 import React from 'react';
 import { List, ListItem, Box, Typography } from '@mui/material';
-import { useTheme } from '../ThemeContext';  // Assuming you have a ThemeContext
+import { useTheme } from '../ThemeContext';
 
 const ActivityTimeline = ({ activityLog }) => {
   const { isDarkMode } = useTheme();
 
-  // Function to generate dynamic color in HSL
+ 
   const getDynamicColor = (index, isBorder = false) => {
     const hue = (index * 60) % 360; 
     const saturation = 50 + (index * 10) % 50;
     const lightness = isBorder ? 80 : 50; 
-    
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   };
 
-  // Convert HSL to RGBA for opacity
+ 
   const hslToRgba = (hsl, opacity) => {
     const [hue, saturation, lightness] = hsl.match(/\d+/g).map(Number);
-    // Convert HSL to RGB
     const c = (1 - Math.abs(2 * lightness / 100 - 1)) * (saturation / 100);
     const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
     const m = lightness / 100 - c / 2;
@@ -41,28 +39,34 @@ const ActivityTimeline = ({ activityLog }) => {
     g = Math.round((g + m) * 255);
     b = Math.round((b + m) * 255);
 
-    // Return RGBA with opacity
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
   return (
     <Box
       sx={{
-        padding: { xs: 1, sm: 2 },
-        borderRadius: 2,
-        boxShadow: 3,
-        height: { xs: 'auto', sm: '460px' },
+        padding: 2,
+        bgcolor: isDarkMode ? '#2a2b40' : '#fefeff',
+        borderRadius: 3,
+        height: '460px',
         overflowY: 'auto',
       }}
     >
-      <Typography variant="h6" sx={{ marginBottom: 2, fontWeight: 'bold', fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+      <Typography
+        variant="h6"
+        sx={{
+          marginBottom: 2,
+          fontWeight: 'bold',
+          fontSize: '1.5rem',
+        }}
+      >
         Activity Timeline
       </Typography>
       <List>
         {activityLog.length > 0 ? (
           activityLog.map((activity, index) => {
             const iconColorHSL = getDynamicColor(index);
-            const borderColorRGBA = hslToRgba(iconColorHSL, 0.5); 
+            const borderColorRGBA = hslToRgba(iconColorHSL, 0.5);
 
             return (
               <div key={index}>
@@ -70,12 +74,12 @@ const ActivityTimeline = ({ activityLog }) => {
                   sx={{
                     borderRadius: 1,
                     display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
+                    flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
                 >
-                  <div style={{ position: 'relative', marginRight: { xs: '0', sm: '20px' } }}>
+                  <div style={{ position: 'relative', marginRight: '20px' }}>
                     <div
                       style={{
                         marginTop: '4px',
@@ -84,29 +88,44 @@ const ActivityTimeline = ({ activityLog }) => {
                         borderRadius: '50%',
                         width: '12px',
                         height: '12px',
-                        boxShadow: `0 0 10px 4px ${borderColorRGBA}`, 
+                        boxShadow: `0 0 10px 4px ${borderColorRGBA}`,
                       }}
                     />
-                    <div
-                      style={{
-                        top: '23px',
-                        position: 'absolute',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '1px',
-                        height: '35px',
-                        backgroundColor: 'lightblue',
-                      }}
-                    />
+                    {index < activityLog.length - 1 && (
+                      <div
+                        style={{
+                          top: '23px',
+                          position: 'absolute',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: '1px',
+                          height: '35px',
+                          backgroundColor: 'lightblue',
+                        }}
+                      />
+                    )}
                   </div>
 
-                  {/* Activity description */}
-                  <Typography sx={{ color: isDarkMode ? '#c7c7df' : '#566a7f', flexGrow: 1, margin: '10px', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                  
+                  <Typography
+                    sx={{
+                      color: isDarkMode ? '#c7c7df' : '#566a7f',
+                      flexGrow: 1,
+                      margin: '10px',
+                      fontSize: '1rem',
+                    }}
+                  >
                     {activity.description}
                   </Typography>
 
-                  {/* Activity time */}
-                  <Typography sx={{ color: isDarkMode ? '#a1a1c7' : '#8792a0', fontSize: { xs: '0.8rem', sm: '13px' }, gap: '50px' }}>
+                 
+                  <Typography
+                    sx={{
+                      color: isDarkMode ? '#a1a1c7' : '#8792a0',
+                      fontSize: '13px',
+                      gap: '50px',
+                    }}
+                  >
                     {activity.time}
                   </Typography>
                 </ListItem>

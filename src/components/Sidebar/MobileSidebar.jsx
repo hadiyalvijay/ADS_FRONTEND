@@ -23,23 +23,34 @@ const MobileSidebar = ({ open, onClose }) => {
     const navigate = useNavigate();
     const isMobile = useMediaQuery('(max-width: 768px)');
 
-    // State to control submenu visibility
-    const [showEmployeeChildren, setShowEmployeeChildren] = useState(false);
+   
+    const [showEmployeeChildren, setShowEmployeeChildren] = useState(() => {
+        return localStorage.getItem('showEmployeeChildren') === 'true' ? true : false;
+    });
 
-    // Ensure component only renders on mobile and when open
+    const [isOpen, setIsOpen] = useState(() => {
+        return localStorage.getItem('isOpen') === 'true' ? true : false;
+    });
     useEffect(() => {
-        if (!isMobile || !open) {
+        localStorage.setItem('isOpen', isOpen);
+    }, [isOpen]);
+    
+    useEffect(() => {
+        if (!isMobile) {
             setShowEmployeeChildren(false);
         }
-    }, [isMobile, open]);
+    }, [isMobile]);
 
-    // Navigation handlers
+  
     const handleItemClick = (item) => {
         if (item === 'Employee') {
-            setShowEmployeeChildren((prev) => !prev);
+            setShowEmployeeChildren((prev) => {
+                const newState = !prev;
+                localStorage.setItem('showEmployeeChildren', newState);
+                return newState;
+            });
         } else if (item === 'Dashboard') {
             navigate('/Dashboard');
-            onClose(); // Close sidebar after navigation
         }
     };
 
@@ -49,10 +60,8 @@ const MobileSidebar = ({ open, onClose }) => {
         } else if (item === 'Attendance') {
             navigate('/Employee/Attendance');
         }
-        onClose(); // Close sidebar after navigation
     };
-
-    // Only render on mobile when open
+    
     if (!isMobile || !open) {
         return null;
     }
@@ -72,7 +81,7 @@ const MobileSidebar = ({ open, onClose }) => {
                 boxShadow: isDarkMode ? '' : '1px 0 8px rgba(0, 0, 0, 0.1)',
             }}
         >
-            {/* Sidebar Header */}
+           
             <Box
                 sx={{
                     display: 'flex',
@@ -114,11 +123,11 @@ const MobileSidebar = ({ open, onClose }) => {
                         borderRadius: '50%',
                         bgcolor: isDarkMode ? '#696cff' : '#696cff',
                         transition: 'transform 0.3s ease',
-                        // transform: isRotated ? 'rotate(180deg)' : 'rotate(0deg)',
+                      
                         '&:hover': {
                             bgcolor: isDarkMode ? '#696cff' : '#696cff',
                         },
-                        // opacity: isCollapsed ? 0 : 1,
+                       
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -131,7 +140,7 @@ const MobileSidebar = ({ open, onClose }) => {
                             justifyContent: 'center',
                             color: "#fff",
                             transition: 'margin-left 0.3s ease',
-                            // transform: isRotated ? 'rotate(180deg)' : 'rotate(0deg)',
+                          
                         }}
                     >
                         {<ChevronLeft />}
