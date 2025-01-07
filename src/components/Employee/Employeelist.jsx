@@ -5,7 +5,7 @@ import { UserCircle2, Mail, Smartphone, Briefcase, Calendar, ArrowUpCircle, Arro
 import EmployeeActionDropdown from './EmployeeActionDropdown';
 import EmployeeModal from './EmployeeModel';
 
-const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
+const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading, isDarkMode }) => {
     const [employeeData, setEmployeeData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -13,16 +13,16 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
 
-   
+
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
 
-   
+
     const [dropdownOpen, setDropdownOpen] = useState(null);
 
     const dropdownRefs = useRef({});
 
-    
+
     const sortData = (data, key, direction) => {
         if (!key || !direction) return data;
 
@@ -30,7 +30,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
             let aValue = key === 'name' ? `${a.firstName} ${a.middleName || ''}` : a[key];
             let bValue = key === 'name' ? `${b.firstName} ${b.middleName || ''}` : b[key];
 
-            
+
             if (key === 'joiningDate') {
                 aValue = new Date(aValue);
                 bValue = new Date(bValue);
@@ -53,7 +53,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
             }
         };
 
-        handleResize(); 
+        handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -82,7 +82,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
             });
             setEmployeeData(updatedData);
 
-            
+
             const currentUser = updatedData.find(emp => emp.isCurrentUser);
             if (currentUser) {
                 localStorage.setItem('username', currentUser.displayName);
@@ -141,11 +141,11 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
 
                 if (response.status === 200) {
 
-                    setEmployeeData((prevData) => prevData.filter((emp) => emp._id !== employeeId)); 
+                    setEmployeeData((prevData) => prevData.filter((emp) => emp._id !== employeeId));
                 }
             } catch (error) {
                 console.error('Error deleting employee:', error);
-               
+
             }
         }
     };
@@ -170,7 +170,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
         setCurrentPage(pageNumber);
     };
 
-   
+
     const BlurredImage = ({ src, alt, className }) => {
         const [isLoaded, setIsLoaded] = useState(false);
         const [hasError, setHasError] = useState(false);
@@ -226,7 +226,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
         );
     };
 
-  
+
     const columns = [
         { key: 'name', label: 'Profile', sortable: true },
         { key: 'officeEmail', label: 'Email', sortable: true },
@@ -263,17 +263,51 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
 
     return (
         <div className="min-w-full">
-            <div className=" mx-auto px-2 py-4 w-auto">
+            <div className="mx-auto px-2 py-4 w-auto">
                 <motion.div
                     initial={{ opacity: 0, y: -50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="bg-white shadow-2xl rounded-2xl w-full h-full flex flex-col"
+                    className="relative bg-white shadow-lg rounded-2xl w-full h-full flex flex-col overflow-hidden"
+                    style={{
+                        backgroundColor: isDarkMode
+                            ? 'rgba(255, 255, 255, 0.1)'
+                            : 'rgba(255, 255, 255, 0.15)',
+                        color: isDarkMode ? '#c7c7df' : '#566a7f',
+                        borderRadius: '12px',
+                        padding: '20px',
+                        height: 'auto',
+                        overflowY: 'auto',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid',
+                        borderColor: isDarkMode
+                            ? 'rgba(255, 255, 255, 0.08)'
+                            : 'rgba(255, 255, 255, 0.3)',
+                        boxShadow: isDarkMode
+                            ? '0 4px 16px 0 rgba(0, 0, 0, 0.15)'
+                            : '0 4px 16px 0 rgba(200, 200, 200, 0.25)',
+                        position: 'relative',
+                    }}
                 >
-                    <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-4 md:p-6 rounded-t-2xl">
-                        <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
-                            Employee Directory
-                        </h2>
+                    {/* Subtle gradient overlay */}
+                    <div
+                        className="absolute inset-0 pointer-events-none rounded-2xl"
+                        style={{
+                            background: isDarkMode
+                                ? 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+                                : 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%)',
+                            zIndex: 1,
+                        }}
+                    />
+
+                    {/* Content container */}
+                    <div className="relative z-10">
+                        <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-4 md:p-6 rounded-t-2xl">
+                            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
+                                Employee Directory
+                            </h2>
+                        </div>
                     </div>
 
 
@@ -409,7 +443,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
                                                             employee={employee}
                                                             onView={handleView}
                                                             onDelete={() => handleDelete(employee._id)}
-                                                            profilePic={employee.profilePic} 
+                                                            profilePic={employee.profilePic}
                                                         />
                                                     </td>
 
@@ -422,7 +456,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
                         )}
                     </AnimatePresence>
 
-                    
+
                     <div className="flex flex-col md:flex-row justify-center items-center py-4">
                         <div className="flex mb-2 md:mb-0">
                             <button
@@ -451,7 +485,7 @@ const Employeelist = ({ onEmployeeClick, currentUsername, setPageLoading }) => {
                         </div>
                     </div>
 
-                   
+
                     {employeeData.length === 0 && !loading && (
                         <motion.div
                             initial={{ opacity: 0 }}

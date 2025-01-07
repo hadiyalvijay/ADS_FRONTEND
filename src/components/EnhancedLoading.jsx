@@ -7,7 +7,7 @@ const EnhancedLoading = ({ fullScreen = false }) => {
   
   
   const containerClasses = fullScreen
-    ? `fixed inset-0 ${isDarkMode ? 'bg-[#232333]' : 'bg-[#ffffff]'} backdrop-blur-sm flex items-center justify-center z-50`
+    ? `fixed inset-0 ${isDarkMode ? 'bg-[#1a1a2e]' : 'bg-[#ffffff]'} backdrop-blur-sm flex items-center justify-center z-50`
     : 'flex items-center justify-center p-4';
 
   return (

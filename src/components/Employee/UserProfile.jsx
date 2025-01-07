@@ -59,8 +59,8 @@ const UserProfile = () => {
     const { firstName, middleName, status, designation, department, country, languages, mobileNumber, skypeId, officeEmail, teams, aadharCard, birthDate, panCard, profilepic } = profileData;
 
     return (
-        <div className="max-w-8xl  mt-1 px-4 " style={{ backgroundColor: isDarkMode ? '#232333' : '#f6f5fa', color: isDarkMode ? '#6d6e8d' : '#566a7f', width: isMobile ? '70%' : '100%' }}>
-          
+        <div className="min-w-8xl  mt-1" style={{ backgroundColor: isDarkMode ? '#232333' : '#f6f5fa', color: isDarkMode ? '#6d6e8d' : '#566a7f', width: isMobile ? '54%' : '100%' }}>
+
             <div className="relative">
                 <div
                     className="bg-gradient-to-r from-teal-400 via-teal-200 to-pink-200 rounded-lg relative overflow-hidden"
@@ -203,12 +203,12 @@ const UserProfile = () => {
                         <div className="bg-white rounded-lg mt-8 shadow-sm">
                             <h2 className="text-sm text-gray-700 font-medium mb-3">TEAMS</h2>
                             <div className="space-y-3">
-                               
+
                                 <div className="flex items-center justify-between text-sm">
                                     <span></span>
                                     <span className="text-gray-400"></span>
                                 </div>
-                               
+
                             </div>
                         </div>
                         <div className="flex justify-center mt-4">
@@ -353,7 +353,7 @@ const UserProfile = () => {
                             </button>
                         </div>
                         <div className="space-y-4">
-                            
+
                             <p className="text-sm">Details about experience will go here.</p>
                         </div>
                     </div>
@@ -367,7 +367,7 @@ const UserProfile = () => {
                             </button>
                         </div>
                         <div className="space-y-4">
-                           
+
                             <p className="text-sm">Details about education will go here.</p>
                         </div>
                     </div>

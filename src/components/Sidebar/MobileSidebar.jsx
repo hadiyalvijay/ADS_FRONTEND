@@ -51,14 +51,17 @@ const MobileSidebar = ({ open, onClose }) => {
             });
         } else if (item === 'Dashboard') {
             navigate('/Dashboard');
+            onClose();
         }
     };
 
     const handleSubItemClick = (item) => {
         if (item === 'Employee') {
             navigate('/Employee/EmployeeList');
+            onClose();
         } else if (item === 'Attendance') {
             navigate('/Employee/Attendance');
+            onClose();
         }
     };
     
@@ -75,9 +78,9 @@ const MobileSidebar = ({ open, onClose }) => {
                 color: isDarkMode ? '#fff' : '#566a7f',
                 left: 0,
                 top: 0,
-                transition: 'width 0.3s ease',
+                transition: 'transform 0.5s ease-in-out',
                 zIndex: 1300,
-                width: "80vw",
+                width: "75vw",
                 boxShadow: isDarkMode ? '' : '1px 0 8px rgba(0, 0, 0, 0.1)',
             }}
         >
@@ -115,7 +118,7 @@ const MobileSidebar = ({ open, onClose }) => {
                     className="toggle-button"
                     onClick={onClose}
                     sx={{
-                        marginLeft: "160px",
+                        marginLeft: "140px",
                         border: '7px solid',
                         height: '40px',
                         width: '40px',

@@ -5,15 +5,15 @@ import { useTheme } from '../ThemeContext';
 const ActivityTimeline = ({ activityLog }) => {
   const { isDarkMode } = useTheme();
 
- 
+
   const getDynamicColor = (index, isBorder = false) => {
-    const hue = (index * 60) % 360; 
+    const hue = (index * 60) % 360;
     const saturation = 50 + (index * 10) % 50;
-    const lightness = isBorder ? 80 : 50; 
+    const lightness = isBorder ? 80 : 50;
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   };
 
- 
+
   const hslToRgba = (hsl, opacity) => {
     const [hue, saturation, lightness] = hsl.match(/\d+/g).map(Number);
     const c = (1 - Math.abs(2 * lightness / 100 - 1)) * (saturation / 100);
@@ -45,11 +45,37 @@ const ActivityTimeline = ({ activityLog }) => {
   return (
     <Box
       sx={{
-        padding: 2,
-        bgcolor: isDarkMode ? '#2a2b40' : '#fefeff',
+        bgcolor: isDarkMode
+        ? 'rgba(42, 43, 64, 0.7)'
+          : 'rgba(255, 255, 255, 0.25)',
+        color: isDarkMode ? '#c7c7df' : '#566a7f',
         borderRadius: 3,
-        height: '460px',
+        p: 5,
+        height: { xs: 'auto', sm: '460px' },
         overflowY: 'auto',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid',
+        borderColor: isDarkMode
+          ? 'rgba(255, 255, 255, 0.15)'
+          : 'rgba(255, 255, 255, 0.8)',
+        boxShadow: isDarkMode
+          ? '0 8px 32px 0 rgba(0, 0, 0, 0.2)'
+          : '0 8px 32px 0 rgba(200, 200, 200, 0.37)',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          borderRadius: 3,
+          background: isDarkMode
+            ? 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+            : '',
+          pointerEvents: 'none'
+        }
       }}
     >
       <Typography
@@ -106,7 +132,7 @@ const ActivityTimeline = ({ activityLog }) => {
                     )}
                   </div>
 
-                  
+
                   <Typography
                     sx={{
                       color: isDarkMode ? '#c7c7df' : '#566a7f',
@@ -118,7 +144,7 @@ const ActivityTimeline = ({ activityLog }) => {
                     {activity.description}
                   </Typography>
 
-                 
+
                   <Typography
                     sx={{
                       color: isDarkMode ? '#a1a1c7' : '#8792a0',

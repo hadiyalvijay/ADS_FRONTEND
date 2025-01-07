@@ -32,7 +32,8 @@ const App = () => {
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     const savedSidebarState = localStorage.getItem('sidebarOpen');
-    return savedSidebarState ? JSON.parse(savedSidebarState) : false;
+    const isMobileView = window.innerWidth <= 900;
+    return isMobileView ? false : (savedSidebarState ? JSON.parse(savedSidebarState) : false);
   });
 
   const { isDarkMode } = useTheme();
@@ -55,7 +56,9 @@ const App = () => {
   const toggleSidebar = () => {
     const newState = !sidebarOpen;
     setSidebarOpen(newState);
-    localStorage.setItem('sidebarOpen', JSON.stringify(newState));
+    if (!isMobile) {
+      localStorage.setItem('sidebarOpen', JSON.stringify(newState));
+    }
   };
 
   const handleSignIn = async (username) => {
@@ -113,7 +116,7 @@ const App = () => {
 
   if (isLoading || pageLoading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-[#232333]' : 'bg-[#ffffff]'}`}>
+      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-[#1a1a2e]' : 'bg-[#f0f2f5]'}`}>
         <EnhancedLoading fullScreen />
       </div>
     );
@@ -124,14 +127,14 @@ const App = () => {
     <div
       className={`
         flex h-auto w-auto 
-        ${isDarkMode ? 'bg-[#232333]' : 'bg-slate-50'}
+        ${isDarkMode ? 'bg-[#1a1a2e]' : 'bg-[#f0f2f5]'}
         ${pageLoading ? 'pointer-events-none' : ''}
       `}
       style={{
         display: 'flex',
         height: 'auto',
         width: 'auto',
-        backgroundColor: isDarkMode ? '#232333' : '#f6f5fa',
+        backgroundColor: isDarkMode ? '#1a1a2e' : '#f0f2f5',
       }}
     >
       {pageLoading && <LoadingOverlay />}
@@ -146,9 +149,9 @@ const App = () => {
                   left: 0,
                   width: '100%',
                   height: '100%',
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                  backdropFilter: 'blur(5px)',
-                  zIndex: 999,
+                  backgroundColor: '#000',
+                  opacity: .5,
+                  zIndex: 1100,
                 }}
                 onClick={() => setSidebarOpen(false)}
               />
@@ -206,10 +209,10 @@ const App = () => {
                     fontSize: '24px',
                   }}
                 >
-                  <h1 style={{ fontSize: '40px' }}>
+                  <h1 style={{ fontSize: isMobile ? '30px' : '40px' }}>
                     {getGreeting()}, {username}
                   </h1>
-                  <p style={{ fontSize: '20px' }}>
+                  <p style={{ fontSize: isMobile ? '18px' : '20px' }}>
                     {new Date().toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',

@@ -43,7 +43,7 @@ const MainContent = ({ sidebarOpen }) => {
           <Box
             elevation={3}
             sx={{
-             
+             mt: 1,
               color: isDarkMode ? '#c7c7df' : '#566a7f',
             }}
           >
@@ -64,7 +64,7 @@ const MainContent = ({ sidebarOpen }) => {
           <Box
             elevation={3}
             sx={{
-             
+             mt: 1,
               color: isDarkMode ? '#c7c7df' : '#566a7f',
             }}
           >
@@ -83,7 +83,7 @@ const MainContent = ({ sidebarOpen }) => {
           <Box
             elevation={3}
             sx={{
-              
+             mt: 1,
               color: isDarkMode ? '#c7c7df' : '#566a7f',
             }}
           >

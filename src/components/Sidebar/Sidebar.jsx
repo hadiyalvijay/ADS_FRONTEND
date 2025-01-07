@@ -104,12 +104,37 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
         position: isMobile ? 'fixed' : 'sticky',
         width: isCollapsed ? '90px' : '260px',
         height: '100vh',
-        bgcolor: isDarkMode ? '#2a2b40' : '#fefeff',
-        color: isDarkMode ? '#fff' : '#566a7f',
+        bgcolor: isDarkMode 
+          ? 'rgba(42, 43, 64, 0.7)'
+          : 'rgba(255, 255, 255, 0.25)',
+        color: isDarkMode ? '#cfc8e3' : '#566a7f',
         left: 0,
         top: 0,
         transition: 'width 0.3s ease',
         zIndex: 1300,
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid',
+        borderColor: isDarkMode 
+          ? 'rgba(255, 255, 255, 0.15)'
+          : 'rgba(255, 255, 255, 0.8)',
+        boxShadow: isDarkMode
+          ? '0 8px 32px 0 rgba(0, 0, 0, 0.2)'
+          : '0 8px 32px 0 rgba(200, 200, 200, 0.37)',
+        // position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          borderRadius: '8px',
+          background: isDarkMode
+            ? 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+            : '',
+          pointerEvents: 'none'
+        },
         '&.mobile-open': {
           zIndex: 9999,
           width: "200px",
@@ -177,7 +202,7 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
               border: '7px solid',
               height: '40px',
               width: '40px',
-              borderColor: isDarkMode ? '#232333' : '#f6f5fa',
+              borderColor: isDarkMode ? '#1a1a2e' : '#f0f2f5',
               borderRadius: '50%',
               bgcolor: isDarkMode ? '#696cff' : '#696cff',
               transition: 'transform 0.3s ease',
@@ -216,11 +241,18 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                   sx={{
                     '&:hover': {
                       bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
+                      '& .MuiListItemIcon-root, & .MuiListItemText-root': {
+                        color: '#696cff !important',
+                      }
                     },
                   }}
                   onClick={() => handleItemClick(item)}
                 >
-                  <ListItemIcon sx={{ marginLeft: '10px', color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
+                  <ListItemIcon sx={{ 
+                    marginLeft: '10px', 
+                    color: isDarkMode ? '#c4bdd9' : '#67798f',
+                    transition: 'color 0.3s ease',
+                  }}>
                     {item === 'Dashboard' && <GridIcon />}
                     {item === 'Employee' && <PersonIcon />}
                   </ListItemIcon>
@@ -228,7 +260,7 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
                     primary={item}
                     sx={{
                       opacity: isCollapsed ? 0 : 1,
-                      transition: 'opacity 0.3s ease',
+                      transition: 'all 0.3s ease',
                       color: isDarkMode ? '#c4bdd9' : '#67798f',
                     }}
                   />
@@ -236,15 +268,34 @@ const Sidebar = ({ open, onClose, toggleScroll }) => {
 
                 {item === 'Employee' && showEmployeeChildren && !isCollapsed && (
                   <>
-                    <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Employee')}>
-                      <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
+                    <ListItem 
+                      button 
+                      sx={{ 
+                        paddingLeft: '50px',
+                        '&:hover': {
+                          '& .MuiListItemIcon-root, & .MuiListItemText-root': {
+                            color: '#696cff !important',
+                          }
+                        },
+                      }} 
+                      onClick={() => handleSubItemClick('Employee')}
+                    >
+                      <ListItemIcon sx={{ color: isDarkMode ? '#cfc8e3' : '#67798f' }}>
                         <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
                       </ListItemIcon>
                       <ListItemText primary="Employee" sx={{ opacity: isCollapsed ? 0 : 1 }} />
                     </ListItem>
 
-                    <ListItem button sx={{ paddingLeft: '50px' }} onClick={() => handleSubItemClick('Attendance')}>
-                      <ListItemIcon sx={{ color: isDarkMode ? '#c4bdd9' : '#67798f' }}>
+                    <ListItem button sx={{ 
+                      paddingLeft: '50px',
+                      '&:hover': {
+                        bgcolor: isDarkMode ? '#3e3e52' : '#f5f5f5',
+                        '& .MuiListItemIcon-root, & .MuiListItemText-root': {
+                          color: '#696cff !important',
+                        }
+                      },
+                    }} onClick={() => handleSubItemClick('Attendance')}>
+                      <ListItemIcon sx={{ color: isDarkMode ? '#cfc8e3' : '#67798f' }}>
                         <FiberManualRecordIcon sx={{ fontSize: '10px' }} />
                       </ListItemIcon>
                       <ListItemText primary="Attendance" sx={{ opacity: isCollapsed ? 0 : 1 }} />

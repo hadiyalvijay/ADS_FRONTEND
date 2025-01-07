@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, Grid } from '@mui/material';
+import React, { useEffect, useState, useRef } from 'react';
+import { Box, Typography, Button, Grid, Popper, Paper, Fade, Modal } from '@mui/material';
 import { useTheme } from '../ThemeContext';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Clock from './Clock';
 
 const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
@@ -19,6 +17,11 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
     const [breakTime, setBreakTime] = useState(0);
     const [totalWorkTime, setTotalWorkTime] = useState(0);
     const [isPunchedOut, setIsPunchedOut] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [popperMessage, setPopperMessage] = useState('');
+    const [popperColor, setPopperColor] = useState('success');
+    const containerRef = useRef(null);
+    const [isPopperOpen, setIsPopperOpen] = useState(false);
 
     useEffect(() => {
         const savedStartTime = localStorage.getItem('startTime');
@@ -65,12 +68,19 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
         return () => clearInterval(intervalId);
     }, [isTimerRunning, startTime]);
 
+    const showPopper = (message, color = 'success') => {
+        setPopperMessage(message);
+        setPopperColor(color);
+        setIsPopperOpen(true);
+        setTimeout(() => setIsPopperOpen(false), 3000);
+    };
+
     const punchIn = () => {
         setIsTimerRunning(true);
         const now = Date.now();
         setStartTime(now);
         setCurrentActivity('Punch In');
-        toast.success("Punch In Successfully!");
+        showPopper('Punch In Successfully!');
         localStorage.setItem('startTime', now);
         logActivity('Punch In');
     };
@@ -81,7 +91,7 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
             const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
             setWorkTime(prev => prev + elapsedTime);
             setStartTime(Date.now());
-            toast.info('Lunch In Successfully!');
+            showPopper('Lunch In Successfully!', 'info');
             logActivity('Lunch In');
         }
     };
@@ -92,7 +102,7 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
             setLunchTime(prev => prev + elapsedLunchTime);
             setIsOnLunch(false);
             setStartTime(Date.now());
-            toast.success('Lunch break ended!');
+            showPopper('Lunch break ended!');
             logActivity('Lunch Out');
         }
     };
@@ -103,7 +113,7 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
             const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
             setWorkTime(prev => prev + elapsedTime);
             setStartTime(Date.now());
-            toast.info('On break!');
+            showPopper('On break!');
             logActivity('Break In');
         }
     };
@@ -114,7 +124,7 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
             setBreakTime(prev => prev + elapsedBreakTime);
             setIsOnBreak(false);
             setStartTime(Date.now());
-            toast.success('Break ended!');
+            showPopper('Break ended!');
             logActivity('Break Out');
         }
     };
@@ -142,13 +152,38 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
 
     return (
         <Box
+            ref={containerRef}
             sx={{
-                bgcolor: isDarkMode ? '#2a2b40' : '#fefeff',
+                bgcolor: isDarkMode 
+                    ? 'rgba(42, 43, 64, 0.7)'
+                    : 'rgba(255, 255, 255, 0.25)',
                 color: isDarkMode ? '#c7c7df' : '#566a7f',
                 borderRadius: 3,
-               
                 p: 5,
                 height: { xs: 'auto', sm: '460px' },
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: '1px solid',
+                borderColor: isDarkMode 
+                    ? 'rgba(255, 255, 255, 0.15)'
+                    : 'rgba(255, 255, 255, 0.8)',
+                boxShadow: isDarkMode
+                    ? '0 8px 32px 0 rgba(0, 0, 0, 0.2)'
+                    : '0 8px 32px 0 rgba(200, 200, 200, 0.37)',
+                // position: 'relative',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: 3,
+                    background: isDarkMode
+                        ? 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+                        : '',
+                    pointerEvents: 'none'
+                }
             }}
         >
             <Typography variant="h6" sx={{ mb: 2 }}>
@@ -168,45 +203,100 @@ const Timesheet = ({ setActivityLog, logActivity, activityLog }) => {
                 {`${time.hours}:${time.minutes}:${time.seconds} ${time.period}`}
             </Typography>
             <Clock time={time} isDarkMode={isDarkMode} />
-            <ToastContainer />
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 4 }}>
+            <Modal
+                open={isPopperOpen}
+                onClose={() => setIsPopperOpen(false)}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '50vh',
+                    width: '50vw',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    
+                }}
+            >
+                <Fade in={isPopperOpen} timeout={350}>
+                    <Paper 
+                        sx={{ 
+                            p: 4,
+                            bgcolor: popperColor === 'success' 
+                                ? 'success.light'
+                                : popperColor === 'info'
+                                ? 'info.light'
+                                : 'primary.light',
+                            color: 'white',
+                            borderRadius: 2,
+                            maxWidth: '90vw',
+                            textAlign: 'center'
+                        }}
+                    >
+                        <Typography variant="h4">{popperMessage}</Typography>
+                    </Paper>
+                </Fade>
+            </Modal>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                 {!isTimerRunning ? (
-                    <Box>
-                        <Button variant="contained" color="primary" onClick={punchIn}>
-                            Punch In
-                        </Button>
-                    </Box>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={punchIn}
+                        sx={{ position: 'static' }}
+                    >
+                        Punch In
+                    </Button>
                 ) : (
-                    <Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                         {isOnBreak ? (
-                            <Button variant="contained" color="success" onClick={breakOut}>
+                            <Button 
+                                variant="contained" 
+                                color="success" 
+                                onClick={breakOut}
+                                sx={{ position: 'static' }}
+                            >
                                 Break Out
                             </Button>
+                        ) : isOnLunch ? (
+                            <Button 
+                                variant="contained" 
+                                color="secondary" 
+                                onClick={lunchOut}
+                                sx={{ position: 'static' }}
+                            >
+                                Lunch Out
+                            </Button>
                         ) : (
-                            <Box>
-                                {isOnLunch ? (
-                                    <Button variant="contained" color="secondary" onClick={lunchOut}>
-                                        Lunch Out
+                            <>
+                                <Button 
+                                    variant="contained" 
+                                    color="primary" 
+                                    onClick={punchOut}
+                                    sx={{ position: 'static' }}
+                                >
+                                    Punch Out
+                                </Button>
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <Button 
+                                        variant="contained" 
+                                        color="secondary" 
+                                        onClick={lunchIn}
+                                        sx={{ position: 'static' }}
+                                    >
+                                        Lunch In
                                     </Button>
-                                ) : (
-                                    <Box sx={{ textAlign: "center", gap: 2 }}>
-                                        <Box>
-                                            <Button variant="contained" color="primary" onClick={punchOut}>
-                                                Punch Out
-                                            </Button>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                                            <Button variant="contained" color="secondary" onClick={lunchIn}>
-                                                Lunch In
-                                            </Button>
-                                            <Button variant="contained" color="success" onClick={breakIn}>
-                                                Break In
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                )}
-                            </Box>
+                                    <Button 
+                                        variant="contained" 
+                                        color="success" 
+                                        onClick={breakIn}
+                                        sx={{ position: 'static' }}
+                                    >
+                                        Break In
+                                    </Button>
+                                </Box>
+                            </>
                         )}
                     </Box>
                 )}

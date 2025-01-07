@@ -63,10 +63,27 @@ const EmployeeModal = ({ isOpen, onClose, employeeData }) => {
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
       background: {
-        default: isDarkMode ? '#121212' : '#fff',
-        paper: isDarkMode ? '#232333' : '#fff',
-      }
-    }
+        default: isDarkMode ? 'rgba(18, 18, 18, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+        paper: isDarkMode ? 'rgba(35, 35, 51, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+      },
+    },
+    components: {
+      MuiBackdrop: {
+        styleOverrides: {
+          root: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+          },
+        },
+      },
+    },
   });
 
   const handleSubmit = async (e) => {
@@ -208,7 +225,8 @@ const EmployeeModal = ({ isOpen, onClose, employeeData }) => {
           variant="contained"
           startIcon={<AddCircleIcon />}
           onClick={() => setOpen(true)}
-          style={{ height: isMobile ? "45px" : "45px", width: isMobile ? "90px" : "170px", backgroundColor: "#696cff", color: 'white' }}
+          className="mx-auto sm:mx-0 mt-4 sm:mt-0 w-32 text-white px-5 py-2 text-sm rounded sm:mr-5 flex items-center gap-1 hover:bg-[#4f52cc] shadow-lg shadow-indigo-500/50"
+          style={{ height: isMobile ? "45px" : "45px", width: isMobile ? "90px" : "170px", backgroundColor: "#696cff" }}
         >
           {isMobile ? 'Add' : 'Add Employee'}
         </Button>
